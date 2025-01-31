@@ -1,4 +1,4 @@
-package com.example.calculator
+package com.example.calculator.presentation.ui
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -12,12 +12,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.calculator.ui.theme.CalculatorTheme
+import com.example.calculator.presentation.ui.theme.CalculatorTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -65,7 +64,6 @@ fun Calculator() {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Buttons
         val buttons = listOf(
             listOf("7", "8", "9", "÷"),
             listOf("4", "5", "6", "×"),
@@ -84,7 +82,7 @@ fun Calculator() {
                         modifier = Modifier.weight(1f),
                         onClick = {
                             when (button) {
-                                "=" -> displayValue = "0"  // Здесь будет логика вычисления
+                                "=" -> displayValue = "0"
                                 else -> {
                                     displayValue = if (displayValue == "0") button
                                     else displayValue + button
