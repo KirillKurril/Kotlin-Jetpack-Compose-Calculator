@@ -1,4 +1,4 @@
-package com.example.calculator.presentation.ui
+package com.example.calculator
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp

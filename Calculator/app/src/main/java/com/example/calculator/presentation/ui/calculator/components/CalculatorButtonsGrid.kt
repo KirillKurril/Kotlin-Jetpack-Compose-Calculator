@@ -12,11 +12,15 @@ import com.example.calculator.domain.model.CalculatorOperation
 fun CalculatorButtonsGrid(
     onNumberClick: (String) -> Unit,
     onOperationClick: (CalculatorOperation) -> Unit,
+    onEqualsClick: () -> Unit,
+    onClearClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = modifier.padding(8.dp)
+        modifier = modifier.padding(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
+        // First row: 7, 8, 9, ÷
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -36,6 +40,78 @@ fun CalculatorButtonsGrid(
                 Text(text = "÷")
             }
         }
-        // Добавьте остальные ряды кнопок аналогично
+
+        // Second row: 4, 5, 6, ×
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            for (i in 4..6) {
+                Button(
+                    onClick = { onNumberClick(i.toString()) },
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text(text = i.toString())
+                }
+            }
+            Button(
+                onClick = { onOperationClick(CalculatorOperation.Multiply) },
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(text = "×")
+            }
+        }
+
+        // Third row: 1, 2, 3, -
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            for (i in 1..3) {
+                Button(
+                    onClick = { onNumberClick(i.toString()) },
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text(text = i.toString())
+                }
+            }
+            Button(
+                onClick = { onOperationClick(CalculatorOperation.Subtract) },
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(text = "-")
+            }
+        }
+
+        // Fourth row: C, 0, =, +
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Button(
+                onClick = { onClearClick() },
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(text = "C")
+            }
+            Button(
+                onClick = { onNumberClick("0") },
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(text = "0")
+            }
+            Button(
+                onClick = { onEqualsClick() },
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(text = "=")
+            }
+            Button(
+                onClick = { onOperationClick(CalculatorOperation.Add) },
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(text = "+")
+            }
+        }
     }
 }

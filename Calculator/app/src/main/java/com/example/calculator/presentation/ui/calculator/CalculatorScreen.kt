@@ -1,8 +1,7 @@
-// D:/uni/PRMP/Calculator/app/src/main/java/com/example/calculator/presentation/ui/CalculatorScreen.kt
-package com.example.calculator.presentation.ui
+package com.example.calculator.presentation.ui.calculator
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -19,8 +18,11 @@ fun CalculatorScreen(
     val state by viewModel.state
 
     Column(modifier = Modifier.fillMaxSize()) {
-        CalculatorDisplay(state = state)
-
+        CalculatorDisplay(
+            state = state,
+            modifier = Modifier
+        )
+        
         CalculatorButtonsGrid(
             onNumberClick = { number ->
                 viewModel.onAction(CalculatorAction.Number(number))
