@@ -3,6 +3,7 @@ package com.example.calculator.presentation.ui
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -19,7 +20,10 @@ fun CalculatorScreen(
     val state by viewModel.state
 
     Column(modifier = Modifier.fillMaxSize()) {
-        CalculatorDisplay(state = state)
+        CalculatorDisplay(
+            state = state,
+            modifier = Modifier.fillMaxWidth()
+        )
 
         CalculatorButtonsGrid(
             onNumberClick = { number ->
@@ -33,7 +37,20 @@ fun CalculatorScreen(
             },
             onClearClick = {
                 viewModel.onAction(CalculatorAction.Clear)
-            }
+            },
+            onBackspaceClick = {
+                viewModel.onAction(CalculatorAction.Backspace)
+            },
+            onToggleSignClick = {
+                viewModel.onAction(CalculatorAction.ToggleSign)
+            },
+            onDecimalClick = {
+                viewModel.onAction(CalculatorAction.Decimal)
+            },
+            onPercentClick = {
+                viewModel.onAction(CalculatorAction.Percent)
+            },
+            modifier = Modifier.weight(1f)
         )
     }
 }

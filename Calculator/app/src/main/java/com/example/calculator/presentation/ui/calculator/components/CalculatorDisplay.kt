@@ -1,9 +1,12 @@
 package com.example.calculator.presentation.ui.calculator.components
 
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -15,17 +18,53 @@ fun CalculatorDisplay(
     state: CalculatorState,
     modifier: Modifier = Modifier
 ) {
-    Text(
-        text = when {
-            state.result.isNotEmpty() -> state.result
-            state.number2.isNotEmpty() -> state.number2
-            state.number1.isNotEmpty() -> state.number1
-            else -> "0"
-        },
-        textAlign = TextAlign.End,
+    val scrollState = rememberScrollState()
+    
+    Box(
         modifier = modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        fontSize = 48.sp
-    )
+            .height(180.dp)
+            .padding(horizontal = 4.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .verticalScroll(scrollState),
+            verticalArrangement = Arrangement.Bottom,
+            horizontalAlignment = Alignment.End
+        ) {
+            if (state.expression.isNotEmpty()) {
+                Text(
+                    text = state.expression,
+                    style = MaterialTheme.typography.titleLarge.copy(
+                        fontSize = 32.sp,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                    ),
+                    textAlign = TextAlign.End,
+                    maxLines = Int.MAX_VALUE
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+            
+            if (state.result.isNotEmpty()) {
+                Text(
+                    text = "= ${state.result}",
+                    style = MaterialTheme.typography.headlineLarge.copy(
+                        color = MaterialTheme.colorScheme.primary
+                    ),
+                    textAlign = TextAlign.End,
+                    maxLines = 1
+                )
+            }
+
+            if (state.isError) {
+                Text(
+                    text = "Error",
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = MaterialTheme.colorScheme.error,
+                    textAlign = TextAlign.End,
+                    maxLines = 1
+                )
+            }
+        }
+    }
 }
