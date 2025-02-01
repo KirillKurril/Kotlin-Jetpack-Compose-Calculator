@@ -28,21 +28,45 @@ class CalculatorViewModel @Inject constructor(
     
     private fun enterNumber(number: String) {
         val currentState = _state.value
+        
+        // If we have a result and user enters a new number, clear the state first
+        if (currentState.result.isNotEmpty()) {
+            _state.value = CalculatorState()
+            enterNumber(number)
+            return
+        }
+
         if (currentState.operation == null) {
-            _state.value = currentState.copy(
-                number1 = currentState.number1 + number
-            )
+            // Handle number1
+            val newNumber = when {
+                currentState.number1 == "0" && number == "0" -> "0"
+                currentState.number1 == "0" -> number
+                else -> currentState.number1 + number
+            }
+            _state.value = currentState.copy(number1 = newNumber)
         } else {
-            _state.value = currentState.copy(
-                number2 = currentState.number2 + number
-            )
+            // Handle number2
+            val newNumber = when {
+                currentState.number2 == "0" && number == "0" -> "0"
+                currentState.number2 == "0" -> number
+                else -> currentState.number2 + number
+            }
+            _state.value = currentState.copy(number2 = newNumber)
         }
     }
 
     private fun enterOperation(operation: CalculatorOperation) {
         val currentState = _state.value
         if (currentState.number1.isNotEmpty()) {
-            _state.value = currentState.copy(operation = operation)
+            // If we have a result, use it as number1 for the next operation
+            if (currentState.result.isNotEmpty()) {
+                _state.value = CalculatorState(
+                    number1 = currentState.result,
+                    operation = operation
+                )
+            } else {
+                _state.value = currentState.copy(operation = operation)
+            }
         }
     }
 
@@ -54,7 +78,12 @@ class CalculatorViewModel @Inject constructor(
                 number2 = currentState.number2,
                 operation = currentState.operation
             )
-            _state.value = CalculatorState(number1 = result)
+            _state.value = currentState.copy(
+                result = result,
+                number1 = result,
+                number2 = "",
+                operation = null
+            )
         }
     }
 
