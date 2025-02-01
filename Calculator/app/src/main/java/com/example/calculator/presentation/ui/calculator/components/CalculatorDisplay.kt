@@ -22,14 +22,14 @@ fun CalculatorDisplay(
     
     Box(
         modifier = modifier
-            .height(180.dp)
-            .padding(horizontal = 4.dp)
+            .fillMaxHeight(0.4f)
+            .padding(horizontal = 16.dp, vertical = 24.dp)
     ) {
         Column(
             modifier = Modifier
-                .fillMaxWidth()
+                .fillMaxSize()
                 .verticalScroll(scrollState),
-            verticalArrangement = Arrangement.Bottom,
+            verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.End
         ) {
             if (state.expression.isNotEmpty()) {
@@ -56,10 +56,11 @@ fun CalculatorDisplay(
                 )
             }
 
-            if (state.isError) {
+            if (state.errorMessage != null) {
+                Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "Error",
-                    style = MaterialTheme.typography.headlineMedium,
+                    text = state.errorMessage,
+                    style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.error,
                     textAlign = TextAlign.End,
                     maxLines = 1

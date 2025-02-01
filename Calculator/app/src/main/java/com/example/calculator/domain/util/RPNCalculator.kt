@@ -2,9 +2,19 @@ package com.example.calculator.domain.util
 
 import java.util.*
 import kotlin.math.abs
+import kotlin.math.log10
+import java.text.DecimalFormat
+import java.text.DecimalFormatSymbols
+import java.util.Locale
+
+public class DivisionByZeroException : Exception("Деление на ноль невозможно")
 
 class RPNCalculator {
     companion object {
+        private fun countSignificantDigits(str: String): Int {
+            return str.replace(Regex("[^0-9]"), "").length
+        }
+
         fun evaluate(expression: String): Double {
             val tokens = tokenize(expression)
             val postfix = infixToPostfix(tokens)
@@ -18,7 +28,12 @@ class RPNCalculator {
                 when {
                     expression[i].isDigit() || expression[i] == '.' -> {
                         var number = ""
-                        while (i < expression.length && (expression[i].isDigit() || expression[i] == '.')) {
+                        while (i < expression.length && 
+                              (expression[i].isDigit() || 
+                               expression[i] == '.' || 
+                               expression[i].toLowerCase() == 'e' ||
+                               (expression[i] == '+' || expression[i] == '-') && 
+                               i > 0 && expression[i-1].toLowerCase() == 'e')) {
                             number += expression[i]
                             i++
                         }
@@ -28,7 +43,12 @@ class RPNCalculator {
                     expression[i] == '-' && (i == 0 || expression[i-1] == '(' || tokens.last() in listOf("+", "-", "*", "/", "(")) -> {
                         var number = "-"
                         i++
-                        while (i < expression.length && (expression[i].isDigit() || expression[i] == '.')) {
+                        while (i < expression.length && 
+                              (expression[i].isDigit() || 
+                               expression[i] == '.' ||
+                               expression[i].toLowerCase() == 'e' ||
+                               (expression[i] == '+' || expression[i] == '-') && 
+                               i > 0 && expression[i-1].toLowerCase() == 'e')) {
                             number += expression[i]
                             i++
                         }
@@ -98,7 +118,7 @@ class RPNCalculator {
                             "+" -> a + b
                             "-" -> a - b
                             "*" -> a * b
-                            "/" -> if (b == 0.0) throw IllegalArgumentException("Division by zero")
+                            "/" -> if (b == 0.0) throw DivisionByZeroException()
                                   else a / b
                             "%" -> a * (b / 100.0)
                             else -> throw IllegalArgumentException("Unknown operator: $token")
@@ -113,15 +133,33 @@ class RPNCalculator {
         }
 
         fun formatResult(number: Double): String {
-            return when {
-                abs(number) >= 1e10 || (abs(number) < 1e-10 && number != 0.0) -> 
-                    String.format("%.2e", number)
-                else -> {
-                    val formatted = String.format("%.10f", number).trimEnd('0').trimEnd('.')
-                    if (formatted.length > 10) String.format("%.2e", number)
-                    else formatted
-                }
+            val absNumber = abs(number)
+            val exponent = if (absNumber > 0) log10(absNumber).toInt() else 0
+
+            if (absNumber >= 1e15 || (absNumber < 1e-10 && number != 0.0) || abs(exponent) > 10) {
+                return String.format(Locale.US, "%.10e", number)
             }
+
+            val symbols = DecimalFormatSymbols(Locale.US)
+            val format = DecimalFormat().apply {
+                decimalFormatSymbols = symbols
+                maximumFractionDigits = 15
+                minimumFractionDigits = 0
+                isGroupingUsed = false
+            }
+
+            val formatted = format.format(number)
+            val significantDigits = countSignificantDigits(formatted)
+
+            return if (significantDigits > 15) {
+                String.format(Locale.US, "%.10e", number)
+            } else {
+                formatted
+            }
+        }
+
+        fun isOperator(char: Char): Boolean {
+            return char in listOf('+', '-', '*', '/', '%')
         }
     }
 }

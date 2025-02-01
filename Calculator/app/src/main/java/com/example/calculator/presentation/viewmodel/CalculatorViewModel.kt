@@ -3,19 +3,26 @@ package com.example.calculator.presentation.viewmodel
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.calculator.domain.model.CalculatorAction
 import com.example.calculator.domain.model.CalculatorOperation
 import com.example.calculator.domain.state.CalculatorState
 import com.example.calculator.domain.util.RPNCalculator
+import com.example.calculator.domain.util.DivisionByZeroException
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.*
 import javax.inject.Inject
 
 @HiltViewModel
 class CalculatorViewModel @Inject constructor() : ViewModel() {
     private val _state = mutableStateOf(CalculatorState())
     val state: State<CalculatorState> = _state
+    private var errorMessageJob: Job? = null
 
     fun onAction(action: CalculatorAction) {
+        errorMessageJob?.cancel()
+        _state.value = _state.value.copy(errorMessage = null)
+
         when(action) {
             is CalculatorAction.Number -> enterNumber(action.number)
             is CalculatorAction.Operation -> enterOperation(action.operation)
@@ -31,29 +38,46 @@ class CalculatorViewModel @Inject constructor() : ViewModel() {
     private fun enterNumber(number: String) {
         val currentState = _state.value
         
-        // If we have a result, clear it when entering a new number
         if (currentState.result.isNotEmpty()) {
             clearState()
             enterNumber(number)
             return
         }
 
-        // Check if adding this digit would exceed the 10-digit limit
         val currentNum = currentState.currentNumber
-        if (currentNum.replace("-", "").replace(".", "").length >= 10) {
+        if (currentNum.replace("-", "").replace(".", "").length >= 15) {
+            showTemporaryMessage("Максимальная длина числа - 15 символов")
             return
         }
 
         val newNumber = when {
-            currentNum == "0" && number == "0" -> "0"
-            currentNum == "0" -> number
+            currentNum == "0" -> number // Если текущее число 0, заменяем его на вводимую цифру
+            currentNum.isEmpty() && number == "0" -> "0" // Если ввод начинается с 0
             else -> currentNum + number
+        }
+
+        val newExpression = if (currentNum == "0" && number != "0") {
+            // Если текущее число 0 и вводим не 0, заменяем последний символ в выражении
+            currentState.expression.dropLast(1) + number
+        } else {
+            currentState.expression + number
         }
 
         _state.value = currentState.copy(
             currentNumber = newNumber,
-            expression = currentState.expression + number
+            expression = newExpression
         )
+    }
+
+    private fun showTemporaryMessage(message: String) {
+        errorMessageJob?.cancel()
+        errorMessageJob = viewModelScope.launch {
+            _state.value = _state.value.copy(errorMessage = message)
+            delay(3000)
+            if (isActive) {
+                _state.value = _state.value.copy(errorMessage = null)
+            }
+        }
     }
 
     private fun enterOperation(operation: CalculatorOperation) {
@@ -63,6 +87,11 @@ class CalculatorViewModel @Inject constructor() : ViewModel() {
             CalculatorOperation.Subtract -> "-"
             CalculatorOperation.Multiply -> "*"
             CalculatorOperation.Divide -> "/"
+        }
+
+        if (currentState.expression.isNotEmpty() && 
+            RPNCalculator.isOperator(currentState.expression.last())) {
+            return
         }
 
         if (currentState.result.isNotEmpty()) {
@@ -90,10 +119,20 @@ class CalculatorViewModel @Inject constructor() : ViewModel() {
             val formattedResult = RPNCalculator.formatResult(result)
             _state.value = currentState.copy(
                 result = formattedResult,
-                currentNumber = ""
+                currentNumber = "",
+                isError = false,
+                errorMessage = null
             )
         } catch (e: Exception) {
-            _state.value = currentState.copy(isError = true)
+            val errorMessage = when (e) {
+                is DivisionByZeroException -> "Деление на ноль невозможно"
+                else -> "Ошибка в выражении"
+            }
+            _state.value = currentState.copy(
+                isError = true,
+                errorMessage = errorMessage
+            )
+            showTemporaryMessage(errorMessage)
         }
     }
 
@@ -136,11 +175,19 @@ class CalculatorViewModel @Inject constructor() : ViewModel() {
             "-" + currentState.currentNumber
         }
 
-        // Replace the last number in expression with the new signed number
+        val isFirstNumber = currentState.expression.takeWhile { it.isDigit() || it == '-' || it == '.' }
+            .let { it.isEmpty() || it == currentState.currentNumber }
+
         val expressionWithoutLastNumber = currentState.expression.dropLast(currentState.currentNumber.length)
+        val newNumberWithBrackets = if (!isFirstNumber && newNumber.startsWith("-")) {
+            "($newNumber)"
+        } else {
+            newNumber
+        }
+
         _state.value = currentState.copy(
             currentNumber = newNumber,
-            expression = expressionWithoutLastNumber + newNumber
+            expression = expressionWithoutLastNumber + newNumberWithBrackets
         )
     }
 
@@ -167,7 +214,9 @@ class CalculatorViewModel @Inject constructor() : ViewModel() {
 
     private fun enterPercent() {
         val currentState = _state.value
-        if (currentState.currentNumber.isEmpty()) return
+        if (currentState.currentNumber.isEmpty() || 
+            (currentState.expression.isNotEmpty() && 
+             RPNCalculator.isOperator(currentState.expression.last()))) return
 
         _state.value = currentState.copy(
             expression = currentState.expression + "%",
@@ -176,6 +225,7 @@ class CalculatorViewModel @Inject constructor() : ViewModel() {
     }
 
     private fun clearState() {
+        errorMessageJob?.cancel()
         _state.value = CalculatorState()
     }
 }
