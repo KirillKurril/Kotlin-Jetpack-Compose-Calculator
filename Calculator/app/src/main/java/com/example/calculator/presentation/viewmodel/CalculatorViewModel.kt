@@ -50,23 +50,97 @@ class CalculatorViewModel @Inject constructor() : ViewModel() {
             return
         }
 
-        val newNumber = when {
-            currentNum == "0" -> number // Если текущее число 0, заменяем его на вводимую цифру
-            currentNum.isEmpty() && number == "0" -> "0" // Если ввод начинается с 0
-            else -> currentNum + number
-        }
-
-        val newExpression = if (currentNum == "0" && number != "0") {
-            // Если текущее число 0 и вводим не 0, заменяем последний символ в выражении
-            currentState.expression.dropLast(1) + number
-        } else {
-            currentState.expression + number
+        // Предотвращаем ввод нескольких нулей в начале числа
+        if (currentNum == "0" || (currentNum.isEmpty() && number == "0")) {
+            if (number == "0") return
+            _state.value = currentState.copy(
+                currentNumber = number,
+                expression = if (currentState.expression.endsWith("0")) 
+                    currentState.expression.dropLast(1) + number
+                else 
+                    currentState.expression + number
+            )
+            return
         }
 
         _state.value = currentState.copy(
-            currentNumber = newNumber,
-            expression = newExpression
+            currentNumber = currentNum + number,
+            expression = currentState.expression + number
         )
+    }
+
+    private fun enterOperation(operation: CalculatorOperation) {
+        val currentState = _state.value
+        val opSymbol = when(operation) {
+            // Базовые операции
+            CalculatorOperation.Add -> "+"
+            CalculatorOperation.Subtract -> "-"
+            CalculatorOperation.Multiply -> "*"
+            CalculatorOperation.Divide -> "/"
+            // Математические функции
+            CalculatorOperation.Sin -> "sin("
+            CalculatorOperation.Cos -> "cos("
+            CalculatorOperation.Tan -> "tan("
+            CalculatorOperation.Cot -> "cot("
+            CalculatorOperation.Sqrt -> "sqrt("
+            CalculatorOperation.Parentheses -> {
+                val openBrackets = currentState.expression.count { it == '(' }
+                val closeBrackets = currentState.expression.count { it == ')' }
+                if (openBrackets > closeBrackets) ")" else "("
+            }
+        }
+
+        if (currentState.expression.isNotEmpty() && 
+            RPNCalculator.isOperator(currentState.expression.last()) &&
+            operation !in listOf(CalculatorOperation.Sin, CalculatorOperation.Cos, 
+                               CalculatorOperation.Tan, CalculatorOperation.Cot, 
+                               CalculatorOperation.Sqrt, CalculatorOperation.Parentheses)) {
+            return
+        }
+
+        // Для закрывающей скобки проверяем, есть ли открытые скобки
+        if (operation == CalculatorOperation.Parentheses && opSymbol == ")") {
+            if (currentState.currentNumber.isEmpty() && 
+                currentState.expression.isNotEmpty() && 
+                currentState.expression.last() == '(') {
+                return // Не позволяем закрыть пустые скобки
+            }
+        }
+
+        if (currentState.result.isNotEmpty()) {
+            _state.value = CalculatorState(
+                expression = when (operation) {
+                    CalculatorOperation.Sin, CalculatorOperation.Cos,
+                    CalculatorOperation.Tan, CalculatorOperation.Cot,
+                    CalculatorOperation.Sqrt -> "$opSymbol${currentState.result})"
+                    else -> currentState.result + opSymbol
+                },
+                currentNumber = ""
+            )
+            return
+        }
+
+        if (currentState.currentNumber.isNotEmpty() || currentState.expression.isNotEmpty() || 
+            operation in listOf(CalculatorOperation.Sin, CalculatorOperation.Cos,
+                              CalculatorOperation.Tan, CalculatorOperation.Cot,
+                              CalculatorOperation.Sqrt)) {
+            _state.value = currentState.copy(
+                expression = when (operation) {
+                    CalculatorOperation.Sin, CalculatorOperation.Cos,
+                    CalculatorOperation.Tan, CalculatorOperation.Cot,
+                    CalculatorOperation.Sqrt -> {
+                        if (currentState.currentNumber.isNotEmpty()) {
+                            currentState.expression.dropLast(currentState.currentNumber.length) + 
+                            opSymbol + currentState.currentNumber + ")"
+                        } else {
+                            currentState.expression + opSymbol
+                        }
+                    }
+                    else -> currentState.expression + opSymbol
+                },
+                currentNumber = ""
+            )
+        }
     }
 
     private fun showTemporaryMessage(message: String) {
@@ -77,36 +151,6 @@ class CalculatorViewModel @Inject constructor() : ViewModel() {
             if (isActive) {
                 _state.value = _state.value.copy(errorMessage = null)
             }
-        }
-    }
-
-    private fun enterOperation(operation: CalculatorOperation) {
-        val currentState = _state.value
-        val opSymbol = when(operation) {
-            CalculatorOperation.Add -> "+"
-            CalculatorOperation.Subtract -> "-"
-            CalculatorOperation.Multiply -> "*"
-            CalculatorOperation.Divide -> "/"
-        }
-
-        if (currentState.expression.isNotEmpty() && 
-            RPNCalculator.isOperator(currentState.expression.last())) {
-            return
-        }
-
-        if (currentState.result.isNotEmpty()) {
-            _state.value = CalculatorState(
-                expression = currentState.result + opSymbol,
-                currentNumber = ""
-            )
-            return
-        }
-
-        if (currentState.currentNumber.isNotEmpty() || currentState.expression.isNotEmpty()) {
-            _state.value = currentState.copy(
-                expression = currentState.expression + opSymbol,
-                currentNumber = ""
-            )
         }
     }
 

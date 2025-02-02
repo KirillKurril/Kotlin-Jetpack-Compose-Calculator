@@ -4,10 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.calculator.domain.model.CalculatorOperation
 
 @Composable
@@ -26,6 +23,48 @@ fun CalculatorButtonsGrid(
         modifier = modifier.padding(4.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
+        // Top row: Trigonometric functions and sqrt
+        Row(
+            modifier = Modifier.fillMaxWidth().height(48.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            CalculatorButton(
+                text = "sin",
+                onClick = { onOperationClick(CalculatorOperation.Sin) },
+                modifier = Modifier.weight(1f),
+                color = MaterialTheme.colorScheme.tertiaryContainer,
+                fontSize = 16
+            )
+            CalculatorButton(
+                text = "cos",
+                onClick = { onOperationClick(CalculatorOperation.Cos) },
+                modifier = Modifier.weight(1f),
+                color = MaterialTheme.colorScheme.tertiaryContainer,
+                fontSize = 16
+            )
+            CalculatorButton(
+                text = "tan",
+                onClick = { onOperationClick(CalculatorOperation.Tan) },
+                modifier = Modifier.weight(1f),
+                color = MaterialTheme.colorScheme.tertiaryContainer,
+                fontSize = 16
+            )
+            CalculatorButton(
+                text = "cot",
+                onClick = { onOperationClick(CalculatorOperation.Cot) },
+                modifier = Modifier.weight(1f),
+                color = MaterialTheme.colorScheme.tertiaryContainer,
+                fontSize = 16
+            )
+            CalculatorButton(
+                text = "√",
+                onClick = { onOperationClick(CalculatorOperation.Sqrt) },
+                modifier = Modifier.weight(1f),
+                color = MaterialTheme.colorScheme.tertiaryContainer,
+                fontSize = 20
+            )
+        }
+
         // First row: Clear, Toggle Sign, Percent, Divide
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -50,8 +89,8 @@ fun CalculatorButtonsGrid(
                 color = MaterialTheme.colorScheme.secondaryContainer
             )
             CalculatorButton(
-                text = "÷",
-                onClick = { onOperationClick(CalculatorOperation.Divide) },
+                text = "()",
+                onClick = { onOperationClick(CalculatorOperation.Parentheses) },
                 modifier = Modifier.weight(1f),
                 color = MaterialTheme.colorScheme.primaryContainer
             )
@@ -120,7 +159,7 @@ fun CalculatorButtonsGrid(
             )
         }
 
-        // Fifth row: 0, Decimal, Backspace, Equals
+        // Fifth row: 0, Decimal, Backspace, Divide
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -144,45 +183,24 @@ fun CalculatorButtonsGrid(
                 color = MaterialTheme.colorScheme.errorContainer
             )
             CalculatorButton(
+                text = "÷",
+                onClick = { onOperationClick(CalculatorOperation.Divide) },
+                modifier = Modifier.weight(1f),
+                color = MaterialTheme.colorScheme.primaryContainer
+            )
+        }
+
+        // Last row: Equals
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            CalculatorButton(
                 text = "=",
                 onClick = onEqualsClick,
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.fillMaxWidth(),
                 color = MaterialTheme.colorScheme.primary
             )
         }
-    }
-}
-
-@Composable
-private fun CalculatorButton(
-    text: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    color: Color = MaterialTheme.colorScheme.surface
-) {
-    Button(
-        onClick = onClick,
-        modifier = modifier
-            .height(72.dp)
-            .fillMaxWidth(),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = color,
-            contentColor = contentColorFor(color)
-        )
-    ) {
-        Text(
-            text = text,
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold
-        )
-    }
-}
-
-@Composable
-private fun contentColorFor(backgroundColor: Color): Color {
-    return if (backgroundColor == MaterialTheme.colorScheme.primary) {
-        MaterialTheme.colorScheme.onPrimary
-    } else {
-        MaterialTheme.colorScheme.onSurface
     }
 }

@@ -1,8 +1,7 @@
 package com.example.calculator.domain.util
 
 import java.util.*
-import kotlin.math.abs
-import kotlin.math.log10
+import kotlin.math.*
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.util.Locale
@@ -11,6 +10,8 @@ public class DivisionByZeroException : Exception("Деление на ноль �
 
 class RPNCalculator {
     companion object {
+        private val functions = setOf("sin", "cos", "tan", "cot", "sqrt")
+
         private fun countSignificantDigits(str: String): Int {
             return str.replace(Regex("[^0-9]"), "").length
         }
@@ -55,6 +56,18 @@ class RPNCalculator {
                         tokens.add(number)
                         i--
                     }
+                    expression[i].isLetter() -> {
+                        var function = ""
+                        while (i < expression.length && expression[i].isLetter()) {
+                            function += expression[i]
+                            i++
+                        }
+                        if (function !in functions) {
+                            throw IllegalArgumentException("Unknown function: $function")
+                        }
+                        tokens.add(function)
+                        i--
+                    }
                     expression[i] in listOf('+', '-', '*', '/', '(', ')', '%') -> tokens.add(expression[i].toString())
                     !expression[i].isWhitespace() -> throw IllegalArgumentException("Invalid character: ${expression[i]}")
                 }
@@ -75,6 +88,7 @@ class RPNCalculator {
             for (token in tokens) {
                 when {
                     token.toDoubleOrNull() != null -> output.add(token)
+                    token in functions -> operators.push(token)
                     token == "(" -> operators.push(token)
                     token == ")" -> {
                         while (operators.isNotEmpty() && operators.peek() != "(") {
@@ -82,10 +96,14 @@ class RPNCalculator {
                         }
                         if (operators.isNotEmpty() && operators.peek() == "(") {
                             operators.pop()
+                            if (operators.isNotEmpty() && operators.peek() in functions) {
+                                output.add(operators.pop())
+                            }
                         }
                     }
                     token in precedence -> {
                         while (operators.isNotEmpty() && operators.peek() != "(" &&
+                            operators.peek() !in functions &&
                             precedence.getOrDefault(operators.peek(), 0) >= precedence.getValue(token)) {
                             output.add(operators.pop())
                         }
@@ -95,10 +113,11 @@ class RPNCalculator {
             }
 
             while (operators.isNotEmpty()) {
-                if (operators.peek() == "(") {
+                val op = operators.pop()
+                if (op == "(") {
                     throw IllegalArgumentException("Mismatched parentheses")
                 }
-                output.add(operators.pop())
+                output.add(op)
             }
 
             return output
@@ -122,6 +141,20 @@ class RPNCalculator {
                                   else a / b
                             "%" -> a * (b / 100.0)
                             else -> throw IllegalArgumentException("Unknown operator: $token")
+                        }
+                        stack.push(result)
+                    }
+                    token in functions -> {
+                        if (stack.isEmpty()) throw IllegalArgumentException("Invalid expression")
+                        val a = stack.pop()
+                        val result = when (token) {
+                            "sin" -> sin(a)
+                            "cos" -> cos(a)
+                            "tan" -> tan(a)
+                            "cot" -> 1.0 / tan(a)
+                            "sqrt" -> if (a < 0) throw IllegalArgumentException("Cannot calculate square root of negative number")
+                                     else sqrt(a)
+                            else -> throw IllegalArgumentException("Unknown function: $token")
                         }
                         stack.push(result)
                     }
