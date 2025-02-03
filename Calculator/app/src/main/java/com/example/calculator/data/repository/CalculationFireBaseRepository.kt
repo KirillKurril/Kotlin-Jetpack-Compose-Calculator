@@ -5,7 +5,9 @@ import com.example.calculator.domain.repository.CalculationRepository
 import com.example.calculator.data.api.CalculationsFetchingService
 
 class CalculationFireBaseRepository(private val fetchingService: CalculationsFetchingService) : CalculationRepository {
-    suspend override fun getCalculations(): List<Calculation> {
+    override suspend fun getCalculations(): List<Calculation> {
         return fetchingService.fetchCalculations()
+    }
+    override suspend fun saveCalculation(calculation: Calculation) {
     }
 }

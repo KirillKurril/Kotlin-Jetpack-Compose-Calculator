@@ -4,6 +4,7 @@ import com.example.calculator.data.api.CalculationsFetchingService
 import com.example.calculator.data.repository.CalculationFireBaseRepository
 import com.example.calculator.domain.repository.CalculationRepository
 import com.example.calculator.domain.usecase.GetCalculationsUseCase
+import com.example.calculator.domain.usecase.SaveCalculationsUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -20,6 +21,14 @@ object AppModule {
         repository: CalculationRepository
     ): GetCalculationsUseCase {
         return GetCalculationsUseCase(repository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideSaveCalculationsUseCase(
+        repository: CalculationRepository
+    ): SaveCalculationsUseCase {
+        return SaveCalculationsUseCase(repository)
     }
 
     @Provides

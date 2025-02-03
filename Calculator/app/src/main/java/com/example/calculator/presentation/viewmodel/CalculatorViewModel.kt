@@ -9,6 +9,7 @@ import com.example.calculator.domain.model.CalculatorAction
 import com.example.calculator.domain.model.CalculatorOperation
 import com.example.calculator.domain.state.CalculatorState
 import com.example.calculator.domain.usecase.GetCalculationsUseCase
+import com.example.calculator.domain.usecase.SaveCalculationsUseCase
 import com.example.calculator.domain.util.RPNCalculator
 import com.example.calculator.domain.util.DivisionByZeroException
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -19,7 +20,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CalculatorViewModel @Inject constructor(
-    private val getCalculationsUseCase: GetCalculationsUseCase
+    private val getCalculationsUseCase: GetCalculationsUseCase,
+    private val saveCalculationsUseCase: SaveCalculationsUseCase
 ) : ViewModel() {
     private val _state = mutableStateOf(CalculatorState())
     val state: State<CalculatorState> = _state
@@ -37,6 +39,13 @@ class CalculatorViewModel @Inject constructor(
             } catch (e: Exception) {
                 _calculations.value = listOf()
             }
+        }
+    }
+
+    fun saveCalculations() {
+        val calculation = state.value.toCalculation()
+        viewModelScope.launch {
+            saveCalculationsUseCase(calculation)
         }
     }
 
