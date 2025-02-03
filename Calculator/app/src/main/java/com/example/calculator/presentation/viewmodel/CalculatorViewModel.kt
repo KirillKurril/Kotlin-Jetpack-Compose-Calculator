@@ -4,20 +4,41 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.calculator.domain.model.Calculation
 import com.example.calculator.domain.model.CalculatorAction
 import com.example.calculator.domain.model.CalculatorOperation
 import com.example.calculator.domain.state.CalculatorState
+import com.example.calculator.domain.usecase.GetCalculationsUseCase
 import com.example.calculator.domain.util.RPNCalculator
 import com.example.calculator.domain.util.DivisionByZeroException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
 @HiltViewModel
-class CalculatorViewModel @Inject constructor() : ViewModel() {
+class CalculatorViewModel @Inject constructor(
+    private val getCalculationsUseCase: GetCalculationsUseCase
+) : ViewModel() {
     private val _state = mutableStateOf(CalculatorState())
     val state: State<CalculatorState> = _state
     private var errorMessageJob: Job? = null
+
+    private val _calculations = MutableStateFlow<List<Calculation>>(emptyList())
+    val calculations: StateFlow<List<Calculation>> = _calculations
+
+    fun fetchCalculations()
+    {
+        viewModelScope.launch {
+            try {
+                val fetchedCalculations = getCalculationsUseCase()
+                _calculations.value = fetchedCalculations
+            } catch (e: Exception) {
+                _calculations.value = listOf()
+            }
+        }
+    }
 
     fun onAction(action: CalculatorAction) {
         errorMessageJob?.cancel()

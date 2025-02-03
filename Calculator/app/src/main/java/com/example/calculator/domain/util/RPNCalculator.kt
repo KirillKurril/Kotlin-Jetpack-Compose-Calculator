@@ -32,9 +32,9 @@ class RPNCalculator {
                         while (i < expression.length && 
                               (expression[i].isDigit() || 
                                expression[i] == '.' || 
-                               expression[i].toLowerCase() == 'e' ||
+                               expression[i].lowercaseChar() == 'e' ||
                                (expression[i] == '+' || expression[i] == '-') && 
-                               i > 0 && expression[i-1].toLowerCase() == 'e')) {
+                               i > 0 && expression[i-1].lowercaseChar() == 'e')) {
                             number += expression[i]
                             i++
                         }
@@ -47,9 +47,9 @@ class RPNCalculator {
                         while (i < expression.length && 
                               (expression[i].isDigit() || 
                                expression[i] == '.' ||
-                               expression[i].toLowerCase() == 'e' ||
+                               expression[i].lowercaseChar() == 'e' ||
                                (expression[i] == '+' || expression[i] == '-') && 
-                               i > 0 && expression[i-1].toLowerCase() == 'e')) {
+                               i > 0 && expression[i-1].lowercaseChar() == 'e')) {
                             number += expression[i]
                             i++
                         }

@@ -12,37 +12,74 @@ import com.example.calculator.presentation.viewmodel.CalculatorViewModel
 import com.example.calculator.presentation.ui.calculator.components.CalculatorDisplay
 import com.example.calculator.presentation.ui.calculator.components.CalculatorButtonsGrid
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import kotlin.math.abs
 import android.os.Vibrator
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import com.example.calculator.presentation.ui.calculator.components.CalculationHistoryGrid
+import android.util.Log
+import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.ui.geometry.Offset
 
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CalculatorScreen(
     viewModel: CalculatorViewModel = hiltViewModel()
 ) {
     val state by viewModel.state
     var lastSwipeTime = 0L
-    val minSwipeDistance = 50f
+    val minSwipeDistance = 20f
     val minTimeBetweenSwipes = 300L
     val vibrator = LocalContext.current.getSystemService(Vibrator::class.java)
+    val calculations by viewModel.calculations.collectAsState()
+    var showHistory by remember { mutableStateOf(false) }
+    var accumulatedDrag = Offset.Zero
+    LaunchedEffect(Unit) {
+        viewModel.fetchCalculations()
+    }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .pointerInput(Unit) {
-                detectHorizontalDragGestures { _, dragAmount ->
-                    val currentTime = System.currentTimeMillis()
-                    if (currentTime - lastSwipeTime >= minTimeBetweenSwipes && 
-                        abs(dragAmount) >= minSwipeDistance) {
-                        when {
-                            dragAmount > 0 -> viewModel.onAction(CalculatorAction.ClearAll)
-                            dragAmount < 0 -> viewModel.onAction(CalculatorAction.Backspace)
+                detectDragGestures(
+                    onDragStart = { startOffset ->
+                        Log.d("SwipeGesture", "Drag started at: $startOffset")
+                    },
+                    onDragEnd = {
+                        val totalX = accumulatedDrag.x
+                        val totalY = accumulatedDrag.y
+                        Log.d("SwipeGesture", "Drag ended. Total X: $totalX, Total Y: $totalY")
+
+                        if (System.currentTimeMillis() - lastSwipeTime >= minTimeBetweenSwipes) {
+                            when {
+                                abs(totalX) > abs(totalY) && abs(totalX) >= minSwipeDistance -> {
+                                    if (totalX > 0) {
+                                        viewModel.onAction(CalculatorAction.ClearAll)
+                                    } else {
+                                        viewModel.onAction(CalculatorAction.Backspace)
+                                    }
+                                }
+                                abs(totalY) >= minSwipeDistance -> {
+                                    if (totalY < 0) {
+                                        showHistory = true
+                                    }
+                                }
+                            }
+                            lastSwipeTime = System.currentTimeMillis()
                         }
-                        lastSwipeTime = currentTime
+                        accumulatedDrag = Offset.Zero
+                    },
+                    onDrag = { change, dragAmount ->
+                        accumulatedDrag += dragAmount
+                        change.consume()
                     }
-                }
+                )
             }
+
+
     )   {
         CalculatorDisplay(
             state = state,
@@ -84,5 +121,11 @@ fun CalculatorScreen(
             },
             modifier = Modifier.weight(1f)
         )
+        
+        if (showHistory) {
+            ModalBottomSheet(onDismissRequest = { showHistory = false }) {
+                CalculationHistoryGrid(calculations = calculations)
+            }
+        }
     }
 }
