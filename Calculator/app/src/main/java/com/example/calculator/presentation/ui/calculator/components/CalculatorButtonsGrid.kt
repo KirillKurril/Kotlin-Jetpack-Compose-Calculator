@@ -23,7 +23,6 @@ fun CalculatorButtonsGrid(
         modifier = modifier.padding(4.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        // Top row: Trigonometric functions and sqrt
         Row(
             modifier = Modifier.fillMaxWidth().height(48.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -65,7 +64,6 @@ fun CalculatorButtonsGrid(
             )
         }
 
-        // First row: Clear, Toggle Sign, Percent, Divide
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -96,7 +94,6 @@ fun CalculatorButtonsGrid(
             )
         }
 
-        // Second row: 7, 8, 9, Multiply
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -117,7 +114,6 @@ fun CalculatorButtonsGrid(
             )
         }
 
-        // Third row: 4, 5, 6, Subtract
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -138,7 +134,6 @@ fun CalculatorButtonsGrid(
             )
         }
 
-        // Fourth row: 1, 2, 3, Add
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -159,7 +154,6 @@ fun CalculatorButtonsGrid(
             )
         }
 
-        // Fifth row: 0, Decimal, Backspace, Divide
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -190,7 +184,6 @@ fun CalculatorButtonsGrid(
             )
         }
 
-        // Last row: Equals
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp)

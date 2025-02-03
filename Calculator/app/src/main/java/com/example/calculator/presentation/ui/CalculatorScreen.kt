@@ -22,6 +22,7 @@ fun CalculatorScreen(
     Column(modifier = Modifier.fillMaxSize()) {
         CalculatorDisplay(
             state = state,
+            onAction = viewModel::onAction,
             modifier = Modifier.fillMaxWidth()
         )
 

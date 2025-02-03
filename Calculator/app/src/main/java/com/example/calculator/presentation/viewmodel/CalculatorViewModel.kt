@@ -27,7 +27,12 @@ class CalculatorViewModel @Inject constructor() : ViewModel() {
             is CalculatorAction.Number -> enterNumber(action.number)
             is CalculatorAction.Operation -> enterOperation(action.operation)
             is CalculatorAction.Calculate -> calculate()
-            is CalculatorAction.Clear -> clearState()
+            is CalculatorAction.Clear -> {
+                _state.value = CalculatorState()
+            }
+            is CalculatorAction.ClearAll -> {
+                _state.value = CalculatorState()
+            }
             is CalculatorAction.Backspace -> backspace()
             is CalculatorAction.ToggleSign -> toggleSign()
             is CalculatorAction.Decimal -> enterDecimal()
@@ -50,7 +55,7 @@ class CalculatorViewModel @Inject constructor() : ViewModel() {
             return
         }
 
-        // Предотвращаем ввод нескольких нулей в начале числа
+
         if (currentNum == "0" || (currentNum.isEmpty() && number == "0")) {
             if (number == "0") return
             _state.value = currentState.copy(
@@ -72,12 +77,12 @@ class CalculatorViewModel @Inject constructor() : ViewModel() {
     private fun enterOperation(operation: CalculatorOperation) {
         val currentState = _state.value
         val opSymbol = when(operation) {
-            // Базовые операции
+
             CalculatorOperation.Add -> "+"
             CalculatorOperation.Subtract -> "-"
             CalculatorOperation.Multiply -> "*"
             CalculatorOperation.Divide -> "/"
-            // Математические функции
+
             CalculatorOperation.Sin -> "sin("
             CalculatorOperation.Cos -> "cos("
             CalculatorOperation.Tan -> "tan("
@@ -98,12 +103,11 @@ class CalculatorViewModel @Inject constructor() : ViewModel() {
             return
         }
 
-        // Для закрывающей скобки проверяем, есть ли открытые скобки
         if (operation == CalculatorOperation.Parentheses && opSymbol == ")") {
             if (currentState.currentNumber.isEmpty() && 
                 currentState.expression.isNotEmpty() && 
                 currentState.expression.last() == '(') {
-                return // Не позволяем закрыть пустые скобки
+                return
             }
         }
 
