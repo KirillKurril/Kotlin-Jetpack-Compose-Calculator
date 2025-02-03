@@ -1,4 +1,3 @@
-// D:/uni/PRMP/Calculator/app/src/main/java/com/example/calculator/presentation/ui/CalculatorScreen.kt
 package com.example.calculator.presentation.ui
 
 import androidx.compose.foundation.layout.Column
@@ -12,17 +11,42 @@ import com.example.calculator.domain.model.CalculatorAction
 import com.example.calculator.presentation.viewmodel.CalculatorViewModel
 import com.example.calculator.presentation.ui.calculator.components.CalculatorDisplay
 import com.example.calculator.presentation.ui.calculator.components.CalculatorButtonsGrid
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import kotlin.math.abs
+
 
 @Composable
 fun CalculatorScreen(
     viewModel: CalculatorViewModel = hiltViewModel()
 ) {
     val state by viewModel.state
+    var lastSwipeTime = 0L
+    val minSwipeDistance = 50f
+    val minTimeBetweenSwipes = 300L
 
-    Column(modifier = Modifier.fillMaxSize()) {
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .pointerInput(Unit) {
+                detectHorizontalDragGestures { _, dragAmount ->
+                    val currentTime = System.currentTimeMillis()
+                    if (currentTime - lastSwipeTime >= minTimeBetweenSwipes && 
+                        abs(dragAmount) >= minSwipeDistance) {
+                        when {
+                            dragAmount > 0 -> viewModel.onAction(CalculatorAction.ClearAll)
+                            dragAmount < 0 -> viewModel.onAction(CalculatorAction.Backspace)
+                        }
+                        lastSwipeTime = currentTime
+                    }
+                }
+            }
+    )   {
         CalculatorDisplay(
             state = state,
-            onAction = viewModel::onAction,
             modifier = Modifier.fillMaxWidth()
         )
 
