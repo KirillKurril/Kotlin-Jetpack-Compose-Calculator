@@ -45,8 +45,7 @@ android {
 dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.firestore.ktx)
-    implementation(libs.firebase.analytics)
-    implementation(libs.firebase.crashlytics.ktx)
+    //implementation(libs.firebase.crashlytics.ktx)
 
     implementation(libs.material3)
     implementation(libs.androidx.core.ktx)
