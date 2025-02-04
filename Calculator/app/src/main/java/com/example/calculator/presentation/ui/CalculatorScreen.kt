@@ -20,7 +20,11 @@ import androidx.compose.runtime.*
 import com.example.calculator.presentation.ui.calculator.components.CalculationHistoryGrid
 import android.util.Log
 import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.geometry.Offset
+import com.example.calculator.presentation.ui.calculator.components.ThemeSelector
+import androidx.compose.material3.BasicAlertDialog
+import com.example.calculator.presentation.ui.theme.CalculatorTheme
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -28,6 +32,8 @@ import androidx.compose.ui.geometry.Offset
 fun CalculatorScreen(
     viewModel: CalculatorViewModel = hiltViewModel()
 ) {
+
+    val selectedTheme by viewModel.selectedTheme.observeAsState()
     val state by viewModel.state
     var lastSwipeTime = 0L
     val minSwipeDistance = 20f
@@ -35,97 +41,176 @@ fun CalculatorScreen(
     val vibrator = LocalContext.current.getSystemService(Vibrator::class.java)
     val calculations by viewModel.calculations.collectAsState()
     var showHistory by remember { mutableStateOf(false) }
+    var showThemeSelector by remember { mutableStateOf(false) }
     var accumulatedDrag = Offset.Zero
     LaunchedEffect(Unit) {
         viewModel.fetchCalculations()
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .pointerInput(Unit) {
-                detectDragGestures(
-                    onDragStart = { startOffset ->
-                        Log.d("SwipeGesture", "Drag started at: $startOffset")
-                    },
-                    onDragEnd = {
-                        val totalX = accumulatedDrag.x
-                        val totalY = accumulatedDrag.y
-                        Log.d("SwipeGesture", "Drag ended. Total X: $totalX, Total Y: $totalY")
+    if (selectedTheme != null) {
+        CalculatorTheme(selectedTheme!!) {
+            Surface(
+                modifier = Modifier.fillMaxSize(),
+                color = MaterialTheme.colorScheme.background
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .pointerInput(Unit) {
+                            detectDragGestures(
+                                onDragStart = { startOffset ->
+                                    Log.d("SwipeGesture", "Drag started at: $startOffset")
+                                },
+                                onDragEnd = {
+                                    val totalX = accumulatedDrag.x
+                                    val totalY = accumulatedDrag.y
+                                    Log.d(
+                                        "SwipeGesture",
+                                        "Drag ended. Total X: $totalX, Total Y: $totalY"
+                                    )
 
-                        if (System.currentTimeMillis() - lastSwipeTime >= minTimeBetweenSwipes) {
-                            when {
-                                abs(totalX) > abs(totalY) && abs(totalX) >= minSwipeDistance -> {
-                                    if (totalX > 0) {
-                                        viewModel.onAction(CalculatorAction.ClearAll)
-                                    } else {
-                                        viewModel.onAction(CalculatorAction.Backspace)
+                                    if (System.currentTimeMillis() - lastSwipeTime >= minTimeBetweenSwipes) {
+                                        when {
+                                            abs(totalX) > abs(totalY) && abs(totalX) >= minSwipeDistance -> {
+                                                if (totalX > 0) {
+                                                    viewModel.onAction(CalculatorAction.ClearAll)
+                                                } else {
+                                                    viewModel.onAction(CalculatorAction.Backspace)
+                                                }
+                                            }
+
+                                            abs(totalY) >= minSwipeDistance -> {
+                                                if (totalY < 0) {
+                                                    showHistory = true
+                                                } else {
+                                                    showThemeSelector = true
+                                                }
+                                            }
+                                        }
+                                        lastSwipeTime = System.currentTimeMillis()
                                     }
+                                    accumulatedDrag = Offset.Zero
+                                },
+                                onDrag = { change, dragAmount ->
+                                    accumulatedDrag += dragAmount
+                                    change.consume()
                                 }
-                                abs(totalY) >= minSwipeDistance -> {
-                                    if (totalY < 0) {
-                                        showHistory = true
+                            )
+                        }
+
+
+                ) {
+                    CalculatorDisplay(
+                        state = state,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    CalculatorButtonsGrid(
+                        onNumberClick = { number ->
+                            vibrator?.vibrate(
+                                VibrationEffect.createOneShot(
+                                    50,
+                                    VibrationEffect.DEFAULT_AMPLITUDE
+                                )
+                            )
+                            viewModel.onAction(CalculatorAction.Number(number))
+                        },
+                        onOperationClick = { operation ->
+                            vibrator?.vibrate(
+                                VibrationEffect.createOneShot(
+                                    50,
+                                    VibrationEffect.DEFAULT_AMPLITUDE
+                                )
+                            )
+                            viewModel.onAction(CalculatorAction.Operation(operation))
+                        },
+                        onEqualsClick = {
+                            vibrator?.vibrate(
+                                VibrationEffect.createOneShot(
+                                    50,
+                                    VibrationEffect.DEFAULT_AMPLITUDE
+                                )
+                            )
+                            viewModel.onAction(CalculatorAction.Calculate)
+                        },
+                        onClearClick = {
+                            vibrator?.vibrate(
+                                VibrationEffect.createOneShot(
+                                    50,
+                                    VibrationEffect.DEFAULT_AMPLITUDE
+                                )
+                            )
+                            viewModel.onAction(CalculatorAction.Clear)
+                        },
+                        onBackspaceClick = {
+                            vibrator?.vibrate(
+                                VibrationEffect.createOneShot(
+                                    50,
+                                    VibrationEffect.DEFAULT_AMPLITUDE
+                                )
+                            )
+                            viewModel.onAction(CalculatorAction.Backspace)
+                        },
+                        onToggleSignClick = {
+                            vibrator?.vibrate(
+                                VibrationEffect.createOneShot(
+                                    50,
+                                    VibrationEffect.DEFAULT_AMPLITUDE
+                                )
+                            )
+                            viewModel.onAction(CalculatorAction.ToggleSign)
+                        },
+                        onDecimalClick = {
+                            vibrator?.vibrate(
+                                VibrationEffect.createOneShot(
+                                    50,
+                                    VibrationEffect.DEFAULT_AMPLITUDE
+                                )
+                            )
+                            viewModel.onAction(CalculatorAction.Decimal)
+                        },
+                        onPercentClick = {
+                            vibrator?.vibrate(
+                                VibrationEffect.createOneShot(
+                                    50,
+                                    VibrationEffect.DEFAULT_AMPLITUDE
+                                )
+                            )
+                            viewModel.onAction(CalculatorAction.Percent)
+                        },
+                        modifier = Modifier.weight(1f)
+                    )
+
+                    if (showHistory) {
+                        ModalBottomSheet(onDismissRequest = { showHistory = false }) {
+                            CalculationHistoryGrid(calculations = calculations)
+                        }
+                    }
+
+                    if (showThemeSelector) {
+                        BasicAlertDialog(
+                            onDismissRequest = { showThemeSelector = false },
+                            content = {
+                                Column {
+                                    Text("Выберите тему")
+                                    if (selectedTheme != null) {
+                                        ThemeSelector(currentTheme = selectedTheme!!) { selected ->
+                                            viewModel.onThemeSelected(selected)
+                                            showThemeSelector = false
+                                        }
+                                    } else {
+                                        CircularProgressIndicator()
                                     }
                                 }
                             }
-                            lastSwipeTime = System.currentTimeMillis()
-                        }
-                        accumulatedDrag = Offset.Zero
-                    },
-                    onDrag = { change, dragAmount ->
-                        accumulatedDrag += dragAmount
-                        change.consume()
+                        )
                     }
-                )
+                }
             }
 
-
-    )   {
-        CalculatorDisplay(
-            state = state,
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        CalculatorButtonsGrid(
-            onNumberClick = { number ->
-                vibrator?.vibrate(VibrationEffect.createOneShot(50, VibrationEffect.DEFAULT_AMPLITUDE))
-                viewModel.onAction(CalculatorAction.Number(number))
-            },
-            onOperationClick = { operation ->
-                vibrator?.vibrate(VibrationEffect.createOneShot(50, VibrationEffect.DEFAULT_AMPLITUDE))
-                viewModel.onAction(CalculatorAction.Operation(operation))
-            },
-            onEqualsClick = {
-                vibrator?.vibrate(VibrationEffect.createOneShot(50, VibrationEffect.DEFAULT_AMPLITUDE))
-                viewModel.onAction(CalculatorAction.Calculate)
-            },
-            onClearClick = {
-                vibrator?.vibrate(VibrationEffect.createOneShot(50, VibrationEffect.DEFAULT_AMPLITUDE))
-                viewModel.onAction(CalculatorAction.Clear)
-            },
-            onBackspaceClick = {
-                vibrator?.vibrate(VibrationEffect.createOneShot(50, VibrationEffect.DEFAULT_AMPLITUDE))
-                viewModel.onAction(CalculatorAction.Backspace)
-            },
-            onToggleSignClick = {
-                vibrator?.vibrate(VibrationEffect.createOneShot(50, VibrationEffect.DEFAULT_AMPLITUDE))
-                viewModel.onAction(CalculatorAction.ToggleSign)
-            },
-            onDecimalClick = {
-                vibrator?.vibrate(VibrationEffect.createOneShot(50, VibrationEffect.DEFAULT_AMPLITUDE))
-                viewModel.onAction(CalculatorAction.Decimal)
-            },
-            onPercentClick = {
-                vibrator?.vibrate(VibrationEffect.createOneShot(50, VibrationEffect.DEFAULT_AMPLITUDE))
-                viewModel.onAction(CalculatorAction.Percent)
-            },
-            modifier = Modifier.weight(1f)
-        )
-        
-        if (showHistory) {
-            ModalBottomSheet(onDismissRequest = { showHistory = false }) {
-                CalculationHistoryGrid(calculations = calculations)
-            }
         }
+    }
+    else {
+        CircularProgressIndicator()
     }
 }

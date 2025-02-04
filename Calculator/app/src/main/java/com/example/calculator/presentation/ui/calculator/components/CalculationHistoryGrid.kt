@@ -27,8 +27,3 @@ fun CalculationHistoryGrid(calculations: List<Calculation>) {
     }
 }
 
-@Composable
-fun CalculationItem(calculation: Calculation) {
-
-    Text(text = calculation.toString(), modifier = Modifier.padding(vertical = 4.dp))
-}

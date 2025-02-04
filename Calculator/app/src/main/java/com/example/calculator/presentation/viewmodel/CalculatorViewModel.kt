@@ -1,15 +1,22 @@
 package com.example.calculator.presentation.viewmodel
 
+import android.content.ContentValues.TAG
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.calculator.domain.model.Calculation
 import com.example.calculator.domain.model.CalculatorAction
 import com.example.calculator.domain.model.CalculatorOperation
+import com.example.calculator.domain.model.colorScheme.ThemeType
 import com.example.calculator.domain.state.CalculatorState
 import com.example.calculator.domain.usecase.GetCalculationsUseCase
+import com.example.calculator.domain.usecase.GetThemeUseCase
 import com.example.calculator.domain.usecase.SaveCalculationsUseCase
+import com.example.calculator.domain.usecase.SaveThemeUseCase
 import com.example.calculator.domain.util.RPNCalculator
 import com.example.calculator.domain.util.DivisionByZeroException
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,14 +28,43 @@ import javax.inject.Inject
 @HiltViewModel
 class CalculatorViewModel @Inject constructor(
     private val getCalculationsUseCase: GetCalculationsUseCase,
-    private val saveCalculationsUseCase: SaveCalculationsUseCase
+    private val saveCalculationsUseCase: SaveCalculationsUseCase,
+    private val getThemeUseCase: GetThemeUseCase,
+    private val saveThemeUseCase: SaveThemeUseCase
 ) : ViewModel() {
+
     private val _state = mutableStateOf(CalculatorState())
     val state: State<CalculatorState> = _state
     private var errorMessageJob: Job? = null
 
     private val _calculations = MutableStateFlow<List<Calculation>>(emptyList())
     val calculations: StateFlow<List<Calculation>> = _calculations
+
+    private val _selectedTheme = MutableLiveData<ThemeType>()
+    val selectedTheme: LiveData<ThemeType> get() = _selectedTheme
+
+    init{
+        Log.d(TAG, "Попытка получить данные из Firebase")
+        try {
+            fetchCurrentTheme()
+            fetchCalculations()
+        } catch (e: Exception) {
+            Log.e(TAG, "Ошибка при получении данных из Firebase: ${e.message}")
+        }
+    }
+
+    private fun fetchCurrentTheme() {
+        viewModelScope.launch {
+            _selectedTheme.value = getThemeUseCase()
+        }
+    }
+
+    fun onThemeSelected(themeType: ThemeType) {
+        _selectedTheme.value = themeType
+        viewModelScope.launch {
+            saveThemeUseCase(themeType)
+        }
+    }
 
     fun fetchCalculations()
     {
@@ -201,6 +237,13 @@ class CalculatorViewModel @Inject constructor(
                 isError = false,
                 errorMessage = null
             )
+            
+            var successfulCalculation = state.value.toCalculation()
+            viewModelScope.launch {
+                saveCalculationsUseCase.invoke(successfulCalculation)
+                fetchCalculations()
+            }
+
         } catch (e: Exception) {
             val errorMessage = when (e) {
                 is DivisionByZeroException -> "Деление на ноль невозможно"
