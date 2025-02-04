@@ -5,4 +5,5 @@ data class Calculation(
     val expression: String = "",
     val result: String = "",
     val currentNumber: String = "",
+    var timestamp: Long
 )

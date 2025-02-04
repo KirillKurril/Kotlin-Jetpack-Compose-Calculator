@@ -15,7 +15,8 @@ data class CalculatorState(
             id = "",
             expression = this.expression,
             result = this.result,
-            currentNumber = this.currentNumber
+            currentNumber = this.currentNumber,
+            timestamp = 0
         )
     }
 }
