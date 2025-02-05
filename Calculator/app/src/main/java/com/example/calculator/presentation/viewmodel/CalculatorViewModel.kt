@@ -66,6 +66,10 @@ class CalculatorViewModel @Inject constructor(
         }
     }
 
+    fun onCalculationSelected(calculation: Calculation) {
+        _state.value = calculation.toState()
+    }
+
     fun fetchCalculations()
     {
         viewModelScope.launch {

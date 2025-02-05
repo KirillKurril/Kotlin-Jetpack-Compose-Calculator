@@ -5,21 +5,22 @@ import com.example.calculator.data.preferences.PreferencesManager
 import com.example.calculator.domain.servicesInterfaces.ThemeProvider
 import com.example.calculator.domain.model.colorScheme.ThemeType
 import com.google.firebase.firestore.DocumentReference
-import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.tasks.await
 
 class ThemeFireBaseProvider(
     private val preferencesManager: PreferencesManager
 ) : ThemeProvider
 {
-    private val firestore = FirebaseFirestore.getInstance()
-    private val clientDoc : DocumentReference = firestore
+    private val fs = Firebase.firestore
+    private val clientDocRef = fs
         .collection("users")
         .document(preferencesManager.clientId)
 
     override suspend fun fetchTheme() : ThemeType {
         return try {
-            val document = clientDoc.get().await()
+            val document = clientDocRef.get().await()
             if (document != null && document.exists()) {
                 val themeName = document.getString("theme") ?: ThemeType.LIGHT.name
                 ThemeType.valueOf(themeName)
@@ -35,7 +36,7 @@ class ThemeFireBaseProvider(
     
 
     override suspend fun saveTheme(theme: ThemeType) {
-        clientDoc.update("theme", theme)
+        clientDocRef.update("theme", theme)
             .addOnSuccessListener { 
                 Log.w("ThemeFireBaseProvider", "Тема сохранена!")
             }

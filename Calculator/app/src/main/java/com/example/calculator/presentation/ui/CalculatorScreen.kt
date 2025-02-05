@@ -24,6 +24,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.geometry.Offset
 import com.example.calculator.presentation.ui.calculator.components.ThemeSelector
 import androidx.compose.material3.BasicAlertDialog
+import com.example.calculator.domain.model.Calculation
 import com.example.calculator.presentation.ui.theme.CalculatorTheme
 
 
@@ -183,7 +184,10 @@ fun CalculatorScreen(
 
                     if (showHistory) {
                         ModalBottomSheet(onDismissRequest = { showHistory = false }) {
-                            CalculationHistoryGrid(calculations = calculations)
+                            CalculationHistoryGrid(
+                                calculations,
+                                viewModel::onCalculationSelected
+                            )
                         }
                     }
 

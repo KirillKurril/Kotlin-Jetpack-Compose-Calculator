@@ -12,10 +12,8 @@ data class CalculatorState(
 {
     fun toCalculation(): Calculation {
         return Calculation(
-            id = "",
             expression = this.expression,
             result = this.result,
-            currentNumber = this.currentNumber,
             timestamp = 0
         )
     }
