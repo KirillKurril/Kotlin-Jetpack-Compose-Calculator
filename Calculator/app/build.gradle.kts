@@ -1,9 +1,9 @@
 plugins {
-    id("com.google.gms.google-services")
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.hilt)
+    alias(libs.plugins.gms)
     kotlin("kapt")    
 }
 
@@ -43,9 +43,9 @@ android {
 }
 
 dependencies {
+
     implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.firestore.ktx)
-    //implementation(libs.firebase.crashlytics.ktx)
+    implementation(libs.firebase.firestore)
 
     implementation(libs.material3)
     implementation(libs.androidx.core.ktx)

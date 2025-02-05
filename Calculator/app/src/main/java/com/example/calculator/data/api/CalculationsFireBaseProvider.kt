@@ -5,32 +5,31 @@ import android.util.Log
 import com.example.calculator.data.preferences.PreferencesManager
 import com.example.calculator.domain.model.Calculation
 import com.google.firebase.firestore.CollectionReference
-import com.google.firebase.firestore.FirebaseFirestore
 import com.example.calculator.domain.servicesInterfaces.CalculationsProvider
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.tasks.await
 
 class CalculationsFireBaseProvider(
     private val preferencesManager: PreferencesManager
 ) : CalculationsProvider
 {
-    private val firestore = FirebaseFirestore.getInstance()
-    private val calculations : CollectionReference
-
+    private val calculationsCollection : CollectionReference
+    private val fs = Firebase.firestore
     init {
-        firestore
-        val clientRef = firestore
+        val clientDocRef = fs
             .collection("users")
             .document(preferencesManager.clientId)
-        calculations =  clientRef.collection("calculations")
+        calculationsCollection =  clientDocRef.collection("calculations")
     }
 
     override suspend fun fetchCalculations() : List<Calculation> {
         return try {
-            val snapshots = calculations
+            val calculations = calculationsCollection
                 .orderBy("timestamp", com.google.firebase.firestore.Query.Direction.DESCENDING)
                 .get()
                 .await()
-            snapshots.documents.mapNotNull { document ->
+            calculations.documents.mapNotNull { document ->
                 document.toObject(Calculation::class.java)
             }
         } catch (exception: Exception) {
@@ -43,19 +42,19 @@ class CalculationsFireBaseProvider(
 
         calculation.timestamp = System.currentTimeMillis()
 
-        calculations
+        calculationsCollection
             .add(calculation)
             .addOnSuccessListener { documentReference ->
                 Log.d(TAG, "Calculation added with ID: ${documentReference.id}")
             }
             .addOnFailureListener { e -> Log.w(TAG, "Error adding calculation", e) }
 
-        calculations
+        calculationsCollection
             .orderBy("timestamp")
             .get()
-            .addOnSuccessListener { snapshots ->
-                if (snapshots.size() > 50) {
-                    val oldest = snapshots.documents.first()
+            .addOnSuccessListener { calculations ->
+                if (calculations.size() > 50) {
+                    val oldest = calculations.documents.first()
                     oldest.reference.delete()
                 }
             }
@@ -63,11 +62,11 @@ class CalculationsFireBaseProvider(
 
     override suspend fun clearCalculations(){
 
-        calculations
+        calculationsCollection
             .get()
             .addOnSuccessListener { documents ->
                 for (document in documents) {
-                    firestore.document(document.id).delete()
+                    fs.document(document.id).delete()
                         .addOnSuccessListener {
                             Log.d(TAG, "Document ${document.id} successfully deleted!")
                         }
