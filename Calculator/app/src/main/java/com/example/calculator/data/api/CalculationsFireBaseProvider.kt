@@ -23,15 +23,15 @@ class CalculationsFireBaseProvider(
         calculationsCollection =  clientDocRef.collection("calculations")
     }
 
-    override suspend fun fetchCalculations() : List<Calculation> {
+    override suspend fun fetchCalculations(): List<Calculation> {
         return try {
-            val calculations = calculationsCollection
+            val snapshot = calculationsCollection
                 .orderBy("timestamp", com.google.firebase.firestore.Query.Direction.DESCENDING)
                 .get()
                 .await()
-            calculations.documents.mapNotNull { document ->
-                document.toObject(Calculation::class.java)
-            }
+            val calculations = snapshot.toObjects(Calculation::class.java)
+            Log.d("CalculationsProvider", "Deserialized calculations: $calculations")
+            calculations
         } catch (exception: Exception) {
             Log.e("CalculationsProvider", "Ошибка: ${exception.message}")
             emptyList()
