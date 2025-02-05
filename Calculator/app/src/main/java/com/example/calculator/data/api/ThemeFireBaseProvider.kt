@@ -4,7 +4,7 @@ import android.util.Log
 import com.example.calculator.data.preferences.PreferencesManager
 import com.example.calculator.domain.servicesInterfaces.ThemeProvider
 import com.example.calculator.domain.model.colorScheme.ThemeType
-import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.tasks.await
@@ -33,16 +33,15 @@ class ThemeFireBaseProvider(
             ThemeType.LIGHT
         }
     }
-    
+
 
     override suspend fun saveTheme(theme: ThemeType) {
-        clientDocRef.update("theme", theme)
-            .addOnSuccessListener { 
+        clientDocRef.set(mapOf("theme" to theme.name), SetOptions.merge())
+            .addOnSuccessListener {
                 Log.w("ThemeFireBaseProvider", "Тема сохранена!")
             }
             .addOnFailureListener {
                 Log.e("ThemeFireBaseProvider", "Ошибка: ${it.message}")
             }
     }
-    
 }

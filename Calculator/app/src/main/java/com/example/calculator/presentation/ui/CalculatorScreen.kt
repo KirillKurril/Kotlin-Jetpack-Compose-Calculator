@@ -24,6 +24,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.geometry.Offset
 import com.example.calculator.presentation.ui.calculator.components.ThemeSelector
 import androidx.compose.material3.BasicAlertDialog
+import androidx.compose.ui.Alignment
 import com.example.calculator.domain.model.Calculation
 import com.example.calculator.presentation.ui.theme.CalculatorTheme
 
@@ -195,13 +196,18 @@ fun CalculatorScreen(
                         BasicAlertDialog(
                             onDismissRequest = { showThemeSelector = false },
                             content = {
-                                Column {
-                                    Text("Выберите тему")
+                                Column(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
                                     if (selectedTheme != null) {
-                                        ThemeSelector(currentTheme = selectedTheme!!) { selected ->
-                                            viewModel.onThemeSelected(selected)
-                                            showThemeSelector = false
-                                        }
+                                        ThemeSelector(
+                                            currentTheme = selectedTheme!!,
+                                            onThemeSelected = { selected ->
+                                                viewModel.onThemeSelected(selected)
+                                                showThemeSelector = false
+                                            },
+                                        )
                                     } else {
                                         CircularProgressIndicator()
                                     }
