@@ -14,4 +14,8 @@ class CalculationFireBaseRepository(
     override suspend fun saveCalculation(calculation: Calculation) {
         calculationsProvider.uploadCalculation(calculation)
     }
+
+    override suspend fun clearCalculations() {
+        calculationsProvider.clearCalculations()
+    }
 }

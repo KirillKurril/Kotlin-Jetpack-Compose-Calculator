@@ -15,6 +15,7 @@ import com.example.calculator.domain.model.colorScheme.ThemeType
 import com.example.calculator.domain.state.CalculatorState
 import com.example.calculator.domain.usecase.GetCalculationsUseCase
 import com.example.calculator.domain.usecase.GetThemeUseCase
+import com.example.calculator.domain.usecase.ClearCalculationsUseCase
 import com.example.calculator.domain.usecase.SaveCalculationsUseCase
 import com.example.calculator.domain.usecase.SaveThemeUseCase
 import com.example.calculator.domain.util.RPNCalculator
@@ -29,6 +30,7 @@ import javax.inject.Inject
 class CalculatorViewModel @Inject constructor(
     private val getCalculationsUseCase: GetCalculationsUseCase,
     private val saveCalculationsUseCase: SaveCalculationsUseCase,
+    private val clearCalculationsUseCase: ClearCalculationsUseCase,
     private val getThemeUseCase: GetThemeUseCase,
     private val saveThemeUseCase: SaveThemeUseCase
 ) : ViewModel() {
@@ -59,10 +61,19 @@ class CalculatorViewModel @Inject constructor(
         }
     }
 
+    fun onCalculationsClear ()
+    {
+        viewModelScope.launch {
+            clearCalculationsUseCase()
+        }
+        _calculations.value = listOf()
+    }
+
     fun onThemeSelected(themeType: ThemeType) {
         _selectedTheme.value = themeType
         viewModelScope.launch {
             saveThemeUseCase(themeType)
+            fetchCalculations()
         }
     }
 

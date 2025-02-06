@@ -26,6 +26,7 @@ import com.example.calculator.presentation.ui.calculator.components.ThemeSelecto
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.ui.Alignment
 import com.example.calculator.domain.model.Calculation
+import com.example.calculator.presentation.ui.calculator.components.LoadingScreen
 import com.example.calculator.presentation.ui.theme.CalculatorTheme
 
 
@@ -187,7 +188,8 @@ fun CalculatorScreen(
                         ModalBottomSheet(onDismissRequest = { showHistory = false }) {
                             CalculationHistoryGrid(
                                 calculations,
-                                viewModel::onCalculationSelected
+                                viewModel::onCalculationSelected,
+                                viewModel::onCalculationsClear
                             )
                         }
                     }
@@ -221,6 +223,6 @@ fun CalculatorScreen(
         }
     }
     else {
-        CircularProgressIndicator()
+        LoadingScreen()
     }
 }

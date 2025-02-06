@@ -15,6 +15,7 @@ import com.example.calculator.data.api.CalculationsFireBaseProvider
 import com.example.calculator.data.api.ThemeFireBaseProvider
 import com.example.calculator.domain.servicesInterfaces.CalculationsProvider
 import com.example.calculator.domain.servicesInterfaces.ThemeProvider
+import com.example.calculator.domain.usecase.ClearCalculationsUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -87,7 +88,15 @@ object AppModule {
         repository: CalculationRepository
     ): SaveCalculationsUseCase {
         return SaveCalculationsUseCase(repository)
-    }    
+    }
+
+    @Provides
+    @Singleton
+    fun provideClearCalculationsUseCase(
+        repository: CalculationRepository
+    ): ClearCalculationsUseCase {
+        return ClearCalculationsUseCase(repository)
+    }
 
     @Provides
     @Singleton

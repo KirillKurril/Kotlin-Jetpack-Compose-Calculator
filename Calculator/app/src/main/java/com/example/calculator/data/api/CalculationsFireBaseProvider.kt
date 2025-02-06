@@ -60,13 +60,14 @@ class CalculationsFireBaseProvider(
             }
     }
 
-    override suspend fun clearCalculations(){
-
+    override suspend fun clearCalculations() {
         calculationsCollection
             .get()
             .addOnSuccessListener { documents ->
                 for (document in documents) {
-                    fs.document(document.id).delete()
+                    val documentReference = calculationsCollection.document(document.id)
+
+                    documentReference.delete()
                         .addOnSuccessListener {
                             Log.d(TAG, "Document ${document.id} successfully deleted!")
                         }
@@ -79,4 +80,5 @@ class CalculationsFireBaseProvider(
                 Log.w(TAG, "Error getting documents: ", e)
             }
     }
+
 }
