@@ -5,5 +5,7 @@ interface PassKeyProvider {
     fun encryptAndSavePin(pin: String)
     fun isPasswordValid(enteredPassword: String): Boolean
     fun isPinValid(enteredPin: String): Boolean
+    fun resetPassword(password : String)
     fun clear()
+    fun isUserRegistered(): Boolean
 }

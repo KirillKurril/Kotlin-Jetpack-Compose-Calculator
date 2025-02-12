@@ -17,32 +17,48 @@ import android.os.Build
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import com.example.calculator.domain.usecase.auth.CheckUserRegistredUseCase
+import com.example.calculator.presentation.ui.navigation.AppNavigation
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    @Inject
+    lateinit var checkUserRegistredUseCase: CheckUserRegistredUseCase
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             askNotificationPermission()
         }
-        setContent {
-                CalculatorScreen()
+
+        CoroutineScope(Dispatchers.Main).launch {
+            val isUserRegistered = checkUserRegistredUseCase.invoke()
+
+            setContent {
+                AppNavigation(startDestination = if (isUserRegistered) "login" else "registration")
+            }
         }
 
 
-            FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
-                if (!task.isSuccessful) {
-                    Log.w("FCM", "Fetching FCM registration token failed", task.exception)
-                    return@addOnCompleteListener
-                }
-
-                val token = task.result
-
-                val msg = getString(R.string.msg_token_fmt, token)
-                Log.d("FCM", msg)
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                Log.w("FCM", "Fetching FCM registration token failed", task.exception)
+                return@addOnCompleteListener
             }
+
+            val token = task.result
+
+            val msg = getString(R.string.msg_token_fmt, token)
+            Log.d("FCM", msg)
+        }
     }
     private fun askNotificationPermission() {
         if (ContextCompat.checkSelfPermission(

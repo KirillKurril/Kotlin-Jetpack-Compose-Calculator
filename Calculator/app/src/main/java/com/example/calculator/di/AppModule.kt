@@ -24,8 +24,9 @@ import com.example.calculator.domain.servicesInterfaces.PassKeyProvider
 import com.example.calculator.domain.servicesInterfaces.ThemeProvider
 import com.example.calculator.domain.usecase.auth.AuthenticateWithBiometricsUseCase
 import com.example.calculator.domain.usecase.auth.CheckBiometricsPermissionUseCase
-import com.example.calculator.domain.usecase.auth.AreBiometricEnableUseCase
-import com.example.calculator.domain.usecase.auth.ResetPassKeyUseCase
+import com.example.calculator.domain.usecase.auth.AreBiometricAvailableUseCase
+import com.example.calculator.domain.usecase.auth.CheckUserRegistredUseCase
+import com.example.calculator.domain.usecase.auth.ResetPasswordUseCase
 import com.example.calculator.domain.usecase.auth.SetBiometricsPermissionUseCase
 import com.example.calculator.domain.usecase.auth.RegisterUseCase
 import com.example.calculator.domain.usecase.auth.ValidatePasswordUseCase
@@ -157,8 +158,8 @@ object AppModule {
     @Singleton
     fun provideResetPassUseCase(
         repository: PassKeyRepository
-    ):  ResetPassKeyUseCase {
-        return ResetPassKeyUseCase(repository)
+    ):  ResetPasswordUseCase {
+        return ResetPasswordUseCase(repository)
     }
 
     @Provides
@@ -187,6 +188,14 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun provideCheckUserRegistredUseCase(
+        repository: PassKeyRepository
+    ): CheckUserRegistredUseCase {
+        return CheckUserRegistredUseCase(repository)
+    }
+
+    @Provides
+    @Singleton
     fun provideAuthenticateWithBiometricsUseCase(
         biometricsProvider: BiometricsProvider
     ): AuthenticateWithBiometricsUseCase {
@@ -197,8 +206,8 @@ object AppModule {
     @Singleton
     fun provideEnableBiometricAuthUseCase(
         biometricsProvider: BiometricsProvider
-    ): AreBiometricEnableUseCase {
-        return AreBiometricEnableUseCase(biometricsProvider)
+    ): AreBiometricAvailableUseCase {
+        return AreBiometricAvailableUseCase(biometricsProvider)
     }
 
     @Provides

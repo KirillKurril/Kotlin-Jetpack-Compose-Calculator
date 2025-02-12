@@ -105,9 +105,18 @@ class PassKeyAndroidKeystoreProvider(private val context: Context) : PassKeyProv
         return enteredPin == decryptPin()
     }
 
+    override fun resetPassword(password : String) {
+        keyStore.deleteEntry(keyAlias)
+        encryptAndSavePassword(password)
+    }
+
     override fun clear() {
         keyStore.deleteEntry(keyAlias)
         keyStore.deleteEntry(pinKeyAlias)
         sharedPreferences.edit().clear().apply()
+    }
+
+    override fun isUserRegistered(): Boolean {
+        return keyStore.containsAlias(keyAlias)
     }
 }

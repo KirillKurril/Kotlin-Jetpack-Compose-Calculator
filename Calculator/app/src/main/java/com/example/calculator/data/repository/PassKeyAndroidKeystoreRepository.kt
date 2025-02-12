@@ -23,7 +23,16 @@ class PassKeyAndroidKeystoreRepository(
         return passKeyProvider.isPinValid(enteredPin)
     }
 
+    override fun resetPassword(password: String) {
+        passKeyProvider.resetPassword(password)
+    }
+
     override fun clearData() {
         passKeyProvider.clear()
+    }
+
+    override fun isUserRegistered(): Boolean
+    {
+        return passKeyProvider.isUserRegistered()
     }
 }

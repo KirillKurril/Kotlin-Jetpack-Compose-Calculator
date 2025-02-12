@@ -9,5 +9,9 @@ interface PassKeyRepository {
 
     fun isPinValid(enteredPin: String): Boolean
 
+    fun resetPassword(password: String)
+
     fun clearData()
+
+    fun isUserRegistered(): Boolean
 }
