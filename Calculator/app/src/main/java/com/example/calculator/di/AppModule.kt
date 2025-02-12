@@ -27,8 +27,9 @@ import com.example.calculator.domain.usecase.auth.CheckBiometricsPermissionUseCa
 import com.example.calculator.domain.usecase.auth.AreBiometricEnableUseCase
 import com.example.calculator.domain.usecase.auth.ResetPassKeyUseCase
 import com.example.calculator.domain.usecase.auth.SetBiometricsPermissionUseCase
-import com.example.calculator.domain.usecase.auth.SetPassKeyUseCase
-import com.example.calculator.domain.usecase.auth.ValidatePassKeyUseCase
+import com.example.calculator.domain.usecase.auth.RegisterUseCase
+import com.example.calculator.domain.usecase.auth.ValidatePasswordUseCase
+import com.example.calculator.domain.usecase.auth.ValidatePinUseCase
 import com.example.calculator.domain.usecase.calculations.ClearCalculationsUseCase
 import dagger.Module
 import dagger.Provides
@@ -75,8 +76,9 @@ object AppModule {
     @Provides
     @Singleton
     fun providePassKeyProvider(
+        context: Context
     ): PassKeyProvider {
-        return PassKeyAndroidKeystoreProvider()
+        return PassKeyAndroidKeystoreProvider(context)
     }
 
     @Provides
@@ -163,16 +165,24 @@ object AppModule {
     @Singleton
     fun provideSetPassKeyUseCase(
         repository: PassKeyRepository
-    ): SetPassKeyUseCase {
-        return SetPassKeyUseCase(repository)
+    ): RegisterUseCase {
+        return RegisterUseCase(repository)
     }
 
     @Provides
     @Singleton
-    fun provideValidatePassUseCase(
+    fun provideValidatePasswordUseCase(
         repository: PassKeyRepository
-    ): ValidatePassKeyUseCase {
-        return ValidatePassKeyUseCase(repository)
+    ): ValidatePasswordUseCase {
+        return ValidatePasswordUseCase(repository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideValidatePinUseCase(
+        repository: PassKeyRepository
+    ): ValidatePinUseCase {
+        return ValidatePinUseCase(repository)
     }
 
     @Provides

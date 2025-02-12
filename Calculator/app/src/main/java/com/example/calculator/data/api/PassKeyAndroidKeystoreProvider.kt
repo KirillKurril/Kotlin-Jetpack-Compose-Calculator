@@ -6,19 +6,19 @@ import android.security.keystore.KeyProperties
 import android.util.Base64
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKeys
+import com.example.calculator.domain.servicesInterfaces.PassKeyProvider
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
 import javax.crypto.spec.GCMParameterSpec
 import java.security.KeyStore
 
-class PassKeyAndroidKeystoreProvider(private val context: Context) {
+class PassKeyAndroidKeystoreProvider(private val context: Context) : PassKeyProvider {
 
     private val keyAlias = "PassKey"
     private val pinKeyAlias = "PinKey"
     private val keyStore: KeyStore = KeyStore.getInstance("AndroidKeyStore").apply { load(null) }
 
-    // Безопасное хранилище EncryptedSharedPreferences
     private val sharedPreferences = EncryptedSharedPreferences.create(
         "secure_prefs",
         MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC),
@@ -48,21 +48,21 @@ class PassKeyAndroidKeystoreProvider(private val context: Context) {
         keyGenerator.generateKey()
     }
 
-    fun encryptAndSavePassword(passKey: String) {
+    override fun encryptAndSavePassword(passKey: String) {
         val (iv, encryptedData) = encrypt(passKey, keyAlias)
         saveToSharedPreferences("password", iv, encryptedData)
     }
 
-    fun decryptPassword(): String? {
+    private fun decryptPassword(): String? {
         return decrypt("password", keyAlias)
     }
 
-    fun encryptAndSavePin(pin: String) {
+    override fun encryptAndSavePin(pin: String) {
         val (iv, encryptedData) = encrypt(pin, pinKeyAlias)
         saveToSharedPreferences("pin", iv, encryptedData)
     }
 
-    fun decryptPin(): String? {
+    private fun decryptPin(): String? {
         return decrypt("pin", pinKeyAlias)
     }
 
@@ -97,15 +97,15 @@ class PassKeyAndroidKeystoreProvider(private val context: Context) {
         return if (iv != null && data != null) Pair(iv, data) else null
     }
 
-    fun isPasswordValid(enteredPassword: String): Boolean {
+    override fun isPasswordValid(enteredPassword: String): Boolean {
         return enteredPassword == decryptPassword()
     }
 
-    fun isPinValid(enteredPin: String): Boolean {
+    override fun isPinValid(enteredPin: String): Boolean {
         return enteredPin == decryptPin()
     }
 
-    fun clear() {
+    override fun clear() {
         keyStore.deleteEntry(keyAlias)
         keyStore.deleteEntry(pinKeyAlias)
         sharedPreferences.edit().clear().apply()
