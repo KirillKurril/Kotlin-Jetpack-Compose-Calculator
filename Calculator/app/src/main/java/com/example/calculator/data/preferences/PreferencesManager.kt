@@ -20,6 +20,15 @@ class PreferencesManager(private val context: Context){
         else
             clientId = _clientId
     }
+
+
+    fun saveBiometricPermission(isGranted: Boolean) {
+        sharedPreferences.edit().putBoolean("biometric_enabled", isGranted).apply()
+    }
+
+    fun isBiometricPermissionGranted(): Boolean {
+        return sharedPreferences.getBoolean("biometric_enabled", false)
+    }
 }
 
 

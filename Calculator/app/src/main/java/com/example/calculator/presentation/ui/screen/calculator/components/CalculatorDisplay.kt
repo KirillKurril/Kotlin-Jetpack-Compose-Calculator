@@ -1,4 +1,4 @@
-package com.example.calculator.presentation.ui.calculator.components
+package com.example.calculator.presentation.ui.screen.calculator.components
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState

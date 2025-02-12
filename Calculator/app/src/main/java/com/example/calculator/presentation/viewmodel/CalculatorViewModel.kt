@@ -13,11 +13,11 @@ import com.example.calculator.domain.model.CalculatorAction
 import com.example.calculator.domain.model.CalculatorOperation
 import com.example.calculator.domain.model.colorScheme.ThemeType
 import com.example.calculator.domain.state.CalculatorState
-import com.example.calculator.domain.usecase.GetCalculationsUseCase
-import com.example.calculator.domain.usecase.GetThemeUseCase
-import com.example.calculator.domain.usecase.ClearCalculationsUseCase
-import com.example.calculator.domain.usecase.SaveCalculationsUseCase
-import com.example.calculator.domain.usecase.SaveThemeUseCase
+import com.example.calculator.domain.usecase.calculations.GetCalculationsUseCase
+import com.example.calculator.domain.usecase.theme.GetThemeUseCase
+import com.example.calculator.domain.usecase.calculations.ClearCalculationsUseCase
+import com.example.calculator.domain.usecase.calculations.SaveCalculationsUseCase
+import com.example.calculator.domain.usecase.theme.SaveThemeUseCase
 import com.example.calculator.domain.util.RPNCalculator
 import com.example.calculator.domain.util.DivisionByZeroException
 import dagger.hilt.android.lifecycle.HiltViewModel

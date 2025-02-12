@@ -1,4 +1,4 @@
-package com.example.calculator.domain.usecase
+package com.example.calculator.domain.usecase.calculations
 
 import com.example.calculator.domain.model.Calculation
 import com.example.calculator.domain.repository.CalculationRepository

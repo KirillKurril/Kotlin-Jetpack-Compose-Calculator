@@ -1,4 +1,4 @@
-package com.example.calculator.domain.usecase
+package com.example.calculator.domain.usecase.theme
 
 import com.example.calculator.domain.model.colorScheme.ThemeType
 import com.example.calculator.domain.repository.ThemeRepository

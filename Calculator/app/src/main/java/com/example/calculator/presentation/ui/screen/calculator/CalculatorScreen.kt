@@ -1,4 +1,4 @@
-package com.example.calculator.presentation.ui
+package com.example.calculator.presentation.ui.screen.calculator
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -9,24 +9,23 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.calculator.domain.model.CalculatorAction
 import com.example.calculator.presentation.viewmodel.CalculatorViewModel
-import com.example.calculator.presentation.ui.calculator.components.CalculatorDisplay
-import com.example.calculator.presentation.ui.calculator.components.CalculatorButtonsGrid
 import androidx.compose.ui.input.pointer.pointerInput
 import kotlin.math.abs
 import android.os.Vibrator
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import com.example.calculator.presentation.ui.calculator.components.CalculationHistoryGrid
 import android.util.Log
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.geometry.Offset
-import com.example.calculator.presentation.ui.calculator.components.ThemeSelector
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.ui.Alignment
-import com.example.calculator.domain.model.Calculation
-import com.example.calculator.presentation.ui.calculator.components.LoadingScreen
+import com.example.calculator.presentation.ui.screen.calculator.components.CalculationHistoryGrid
+import com.example.calculator.presentation.ui.screen.calculator.components.CalculatorButtonsGrid
+import com.example.calculator.presentation.ui.screen.calculator.components.CalculatorDisplay
+import com.example.calculator.presentation.ui.screen.calculator.components.LoadingScreen
+import com.example.calculator.presentation.ui.screen.calculator.components.ThemeSelector
 import com.example.calculator.presentation.ui.theme.CalculatorTheme
 
 

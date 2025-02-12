@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import com.example.calculator.presentation.ui.CalculatorScreen
+import com.example.calculator.presentation.ui.screen.calculator.CalculatorScreen
 import dagger.hilt.android.AndroidEntryPoint
 
 import android.util.Log
