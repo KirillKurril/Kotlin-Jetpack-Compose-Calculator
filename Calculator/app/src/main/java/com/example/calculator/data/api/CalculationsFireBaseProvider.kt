@@ -2,8 +2,8 @@ package com.example.calculator.data.api
 
 import android.content.ContentValues.TAG
 import android.util.Log
-import com.example.calculator.data.preferences.PreferencesManager
 import com.example.calculator.domain.model.Calculation
+import com.example.calculator.domain.servicesInterfaces.CacheProvider
 import com.google.firebase.firestore.CollectionReference
 import com.example.calculator.domain.servicesInterfaces.CalculationsProvider
 import com.google.firebase.firestore.ktx.firestore
@@ -11,7 +11,7 @@ import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.tasks.await
 
 class CalculationsFireBaseProvider(
-    private val preferencesManager: PreferencesManager
+    private val cacheProvider: CacheProvider
 ) : CalculationsProvider
 {
     private val calculationsCollection : CollectionReference
@@ -19,7 +19,7 @@ class CalculationsFireBaseProvider(
     init {
         val clientDocRef = fs
             .collection("users")
-            .document(preferencesManager.clientId)
+            .document(cacheProvider.getClientId())
         calculationsCollection =  clientDocRef.collection("calculations")
     }
 

@@ -1,22 +1,22 @@
 package com.example.calculator.data.api
 
 import android.util.Log
-import com.example.calculator.data.preferences.PreferencesManager
 import com.example.calculator.domain.servicesInterfaces.ThemeProvider
 import com.example.calculator.domain.model.colorScheme.ThemeType
+import com.example.calculator.domain.servicesInterfaces.CacheProvider
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.tasks.await
 
 class ThemeFireBaseProvider(
-    private val preferencesManager: PreferencesManager
+    private val cacheProvider: CacheProvider
 ) : ThemeProvider
 {
     private val fs = Firebase.firestore
     private val clientDocRef = fs
         .collection("users")
-        .document(preferencesManager.clientId)
+        .document(cacheProvider.getClientId())
 
     override suspend fun fetchTheme() : ThemeType {
         return try {

@@ -1,7 +1,7 @@
 package com.example.calculator.di
 
 import android.app.Application
-import com.example.calculator.data.preferences.PreferencesManager
+import com.example.calculator.data.api.PreferencesProvider
 import com.example.calculator.data.repository.CalculationFireBaseRepository
 import com.example.calculator.domain.repository.CalculationRepository
 import com.example.calculator.data.repository.ThemeFireBaseRepository
@@ -18,13 +18,15 @@ import com.example.calculator.data.api.PassKeyAndroidKeystoreProvider
 import com.example.calculator.data.api.ThemeFireBaseProvider
 import com.example.calculator.domain.repository.PassKeyRepository
 import com.example.calculator.domain.servicesInterfaces.BiometricsProvider
+import com.example.calculator.domain.servicesInterfaces.CacheProvider
 import com.example.calculator.domain.servicesInterfaces.CalculationsProvider
 import com.example.calculator.domain.servicesInterfaces.PassKeyProvider
 import com.example.calculator.domain.servicesInterfaces.ThemeProvider
 import com.example.calculator.domain.usecase.auth.AuthenticateWithBiometricsUseCase
 import com.example.calculator.domain.usecase.auth.CheckBiometricsPermissionUseCase
-import com.example.calculator.domain.usecase.auth.EnableBiometricAuthUseCase
+import com.example.calculator.domain.usecase.auth.AreBiometricEnableUseCase
 import com.example.calculator.domain.usecase.auth.ResetPassKeyUseCase
+import com.example.calculator.domain.usecase.auth.SetBiometricsPermissionUseCase
 import com.example.calculator.domain.usecase.auth.SetPassKeyUseCase
 import com.example.calculator.domain.usecase.auth.ValidatePassKeyUseCase
 import com.example.calculator.domain.usecase.calculations.ClearCalculationsUseCase
@@ -48,26 +50,26 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun providePreferencesManager(
+    fun provideCacheManager(
         context: Context
-    ): PreferencesManager {
-        return PreferencesManager(context)
+    ): CacheProvider {
+        return PreferencesProvider(context)
     }
 
     @Provides
     @Singleton
     fun provideCalculationsProvider(
-        preferencesManager: PreferencesManager
+        cacheProvider: CacheProvider
     ): CalculationsProvider {
-        return CalculationsFireBaseProvider(preferencesManager)
+        return CalculationsFireBaseProvider(cacheProvider)
     }
 
     @Provides
     @Singleton
     fun provideThemeProvider(
-        preferencesManager: PreferencesManager
+        cacheProvider: CacheProvider
     ): ThemeProvider {
-        return ThemeFireBaseProvider(preferencesManager)
+        return ThemeFireBaseProvider(cacheProvider)
     }
 
     @Provides
@@ -80,8 +82,9 @@ object AppModule {
     @Provides
     @Singleton
     fun provideBiometricsProvider(
+        context: Context
     ): BiometricsProvider {
-        return BiometricsContextProvider()
+        return BiometricsContextProvider(context)
     }
 
     @Provides
@@ -183,16 +186,24 @@ object AppModule {
     @Provides
     @Singleton
     fun provideEnableBiometricAuthUseCase(
-        preferencesManager: PreferencesManager
-    ): EnableBiometricAuthUseCase {
-        return EnableBiometricAuthUseCase(preferencesManager)
+        biometricsProvider: BiometricsProvider
+    ): AreBiometricEnableUseCase {
+        return AreBiometricEnableUseCase(biometricsProvider)
+    }
+
+    @Provides
+    @Singleton
+    fun provideSetBiometricsPermissionUseCase(
+        cacheProvider: CacheProvider
+    ): SetBiometricsPermissionUseCase {
+        return SetBiometricsPermissionUseCase(cacheProvider)
     }
 
     @Provides
     @Singleton
     fun provideCheckBiometricsPermissionUseCase(
-        preferencesManager: PreferencesManager
+        cacheProvider: CacheProvider
     ): CheckBiometricsPermissionUseCase {
-        return CheckBiometricsPermissionUseCase(preferencesManager)
+        return CheckBiometricsPermissionUseCase(cacheProvider)
     }
 }

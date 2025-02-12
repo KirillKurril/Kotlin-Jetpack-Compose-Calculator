@@ -1,5 +1,6 @@
 [versions]
 agp = "8.8.0"
+biometric = "1.1.0"
 kotlin = "2.0.0"
 coreKtx = "1.10.1"
 lifecycleRuntimeKtx = "2.6.1"
@@ -11,8 +12,11 @@ runtimeLivedata = "1.7.7"
 gmsVersion = "4.4.1"
 bomVersion = "33.0.0"
 firebaseMessaging = "24.1.0"
+securityCryptoKtx = "1.1.0-alpha06"
 
 [libraries]
+androidx-biometric = { module = "androidx.biometric:biometric", version.ref = "biometric" }
+androidx-security-crypto-ktx = { module = "androidx.security:security-crypto-ktx", version.ref = "securityCryptoKtx" }
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "bomVersion" }
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore-ktx"}
 firebase-messaging = { group = "com.google.firebase", name = "firebase-messaging-ktx" }
