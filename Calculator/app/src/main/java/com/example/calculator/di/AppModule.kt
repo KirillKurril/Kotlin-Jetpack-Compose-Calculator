@@ -14,12 +14,14 @@ import android.content.Context
 import com.example.calculator.data.api.BiometricsContextProvider
 import com.example.calculator.data.repository.PassKeyAndroidKeystoreRepository
 import com.example.calculator.data.api.CalculationsFireBaseProvider
+import com.example.calculator.data.api.NotificationsChannelManager
 import com.example.calculator.data.api.PassKeyAndroidKeystoreProvider
 import com.example.calculator.data.api.ThemeFireBaseProvider
 import com.example.calculator.domain.repository.PassKeyRepository
 import com.example.calculator.domain.servicesInterfaces.BiometricsProvider
 import com.example.calculator.domain.servicesInterfaces.CacheProvider
 import com.example.calculator.domain.servicesInterfaces.CalculationsProvider
+import com.example.calculator.domain.servicesInterfaces.NotificationsManager
 import com.example.calculator.domain.servicesInterfaces.PassKeyProvider
 import com.example.calculator.domain.servicesInterfaces.ThemeProvider
 import com.example.calculator.domain.usecase.auth.AuthenticateWithBiometricsUseCase
@@ -90,6 +92,15 @@ object AppModule {
     ): BiometricsProvider {
         return BiometricsContextProvider(context)
     }
+
+    @Provides
+    @Singleton
+    fun provideNotificationsManager(
+        context: Context
+    ): NotificationsManager {
+        return NotificationsChannelManager(context)
+    }
+
 
     @Provides
     @Singleton
@@ -231,5 +242,5 @@ object AppModule {
     @Singleton
     fun provideNavigationManager(): NavigationManager {
         return NavigationManager
-    }    
+    }
 }

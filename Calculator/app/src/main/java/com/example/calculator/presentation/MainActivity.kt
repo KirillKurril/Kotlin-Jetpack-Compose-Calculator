@@ -18,6 +18,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
+import com.example.calculator.domain.servicesInterfaces.NotificationsManager
 import com.example.calculator.domain.usecase.auth.CheckUserRegistredUseCase
 import com.example.calculator.presentation.ui.navigation.AppNavigation
 import kotlinx.coroutines.CoroutineScope
@@ -32,8 +33,14 @@ class MainActivity : FragmentActivity() {
     @Inject
     lateinit var checkUserRegistredUseCase: CheckUserRegistredUseCase
 
+    @Inject
+    lateinit var notificationsManager: NotificationsManager
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        notificationsManager.createNotificationChannel()
+
         enableEdgeToEdge()
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
