@@ -27,20 +27,14 @@ class BiometricsContextProvider(
         return _biometricsEnabled
     }
 
-    override fun authenticateBiometric(onSuccess: () -> Unit, onFailure: (String) -> Unit) {
+    override fun authenticateBiometric(currentActivity : FragmentActivity, onSuccess: () -> Unit, onFailure: (String) -> Unit) {
         if (!_biometricsEnabled) {
             onFailure("Fingerprint authentication is not available on this device.")
             return
         }
 
-        val activity = context as? FragmentActivity
-        if (activity == null) {
-            onFailure("Context is not a FragmentActivity")
-            return
-        }
-
         val biometricPrompt = BiometricPrompt(
-            activity,
+            currentActivity,
             ContextCompat.getMainExecutor(context),
             object : BiometricPrompt.AuthenticationCallback() {
                 override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
@@ -60,6 +54,7 @@ class BiometricsContextProvider(
         val biometricPromptInfo = BiometricPrompt.PromptInfo.Builder()
             .setTitle("Biometric Login")
             .setSubtitle("Use your fingerprint to log in")
+            .setNegativeButtonText("Cancel")
             .setDeviceCredentialAllowed(false)
             .build()
 

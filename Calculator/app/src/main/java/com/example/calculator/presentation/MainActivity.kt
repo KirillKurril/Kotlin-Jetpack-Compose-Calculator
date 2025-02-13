@@ -17,6 +17,7 @@ import android.os.Build
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.FragmentActivity
 import com.example.calculator.domain.usecase.auth.CheckUserRegistredUseCase
 import com.example.calculator.presentation.ui.navigation.AppNavigation
 import kotlinx.coroutines.CoroutineScope
@@ -26,7 +27,7 @@ import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class MainActivity : ComponentActivity() {
+class MainActivity : FragmentActivity() {
 
     @Inject
     lateinit var checkUserRegistredUseCase: CheckUserRegistredUseCase

@@ -6,11 +6,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.fragment.app.FragmentActivity
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.calculator.R
 import com.example.calculator.presentation.viewmodel.LoginViewModel
@@ -25,6 +27,8 @@ fun LoginScreen(
     val loginError by viewModel.loginError
     val isBiometricAllowed by viewModel.isBiometricAllow
     val accessConfirmed by viewModel.accessConfirmed
+    val context = LocalContext.current
+    val activity = context as FragmentActivity
 
     LaunchedEffect(accessConfirmed) {
         if (accessConfirmed) {
@@ -92,7 +96,7 @@ fun LoginScreen(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 OutlinedButton(
-                    onClick = { viewModel.onFingerprintCheck() },
+                    onClick = { viewModel.onFingerprintCheck(activity) },
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Icon(painter = painterResource(id = R.drawable.ic_fingerprint), contentDescription = "Biometric Login")

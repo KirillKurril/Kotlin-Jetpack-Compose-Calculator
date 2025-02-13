@@ -2,6 +2,7 @@ package com.example.calculator.presentation.viewmodel
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.calculator.domain.usecase.auth.AuthenticateWithBiometricsUseCase
@@ -44,9 +45,10 @@ class LoginViewModel @Inject constructor(
         _loginError.value = error
     }
 
-    fun onFingerprintCheck() {
+    fun onFingerprintCheck(currentActivity : FragmentActivity) {
         viewModelScope.launch {
             authWithBiometrics.invoke(
+                currentActivity,
                 { accessConfirmedSuccessfully() },
                 { error -> accessFailure(error) }
             )

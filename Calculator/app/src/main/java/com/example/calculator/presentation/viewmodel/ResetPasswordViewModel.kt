@@ -1,7 +1,9 @@
 package com.example.calculator.presentation.viewmodel
 
+import android.app.Activity
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModel
 import com.example.calculator.domain.usecase.auth.AuthenticateWithBiometricsUseCase
 import com.example.calculator.domain.usecase.auth.CheckBiometricsPermissionUseCase
@@ -50,10 +52,11 @@ class ResetPasswordViewModel @Inject constructor(
         _resetError.value = error
     }
 
-    fun onFingerprintCheck() {
+    fun onFingerprintCheck(currentActivity : FragmentActivity) {
         viewModelScope.launch {
             try {
                 authWithBiometrics.invoke(
+                    currentActivity,
                     { accessConfirmedSuccessfully() },
                     { error -> accessFailure(error) }
                 )

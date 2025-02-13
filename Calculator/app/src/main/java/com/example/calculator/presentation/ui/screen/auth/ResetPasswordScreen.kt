@@ -6,11 +6,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.fragment.app.FragmentActivity
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.calculator.R
 import com.example.calculator.presentation.viewmodel.ResetPasswordViewModel
@@ -27,6 +29,9 @@ fun ResetPasswordScreen(
     val isBiometricAllowed by viewModel.isBiometricAllow
     val accessConfirmed by viewModel.accessConfirmed
     val resetError by viewModel.resetError
+
+    val context = LocalContext.current
+    val activity = context as FragmentActivity
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -76,7 +81,7 @@ fun ResetPasswordScreen(
                     Spacer(modifier = Modifier.height(16.dp))
                     
                     OutlinedButton(
-                        onClick = { viewModel.onFingerprintCheck() },
+                        onClick = { viewModel.onFingerprintCheck(activity) },
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Icon(
