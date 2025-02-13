@@ -26,7 +26,6 @@ fun LoginScreen(
     val isBiometricAllowed by viewModel.isBiometricAllow
     val accessConfirmed by viewModel.accessConfirmed
 
-    // Navigation handling
     LaunchedEffect(accessConfirmed) {
         if (accessConfirmed) {
             onLoginSuccess()
@@ -71,7 +70,6 @@ fun LoginScreen(
                 }
             )
 
-            // Error Message
             if (loginError != null) {
                 Text(
                     text = loginError!!,
@@ -83,7 +81,6 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Login Button
             Button(
                 onClick = { viewModel.onPasswordLogin(password) },
                 modifier = Modifier.fillMaxWidth()
@@ -91,7 +88,6 @@ fun LoginScreen(
                 Text("Login")
             }
 
-            // Biometric Authentication Button
             if (isBiometricAllowed) {
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -107,12 +103,18 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Sign Up Button
             TextButton(
-                onClick = { viewModel.onSignUp("") },
+                onClick = { viewModel.onSignUp() },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Sign Up")
+            }
+
+            TextButton(
+                onClick = { viewModel.onSignUp() },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Forgot password?")
             }
         }
     }

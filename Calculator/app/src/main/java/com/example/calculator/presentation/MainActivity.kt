@@ -41,6 +41,7 @@ class MainActivity : ComponentActivity() {
 
         CoroutineScope(Dispatchers.Main).launch {
             val isUserRegistered = checkUserRegistredUseCase.invoke()
+            Log.d("CHECK_REGISTRATION", isUserRegistered.toString())
 
             setContent {
                 AppNavigation(startDestination = if (isUserRegistered) "login" else "registration")

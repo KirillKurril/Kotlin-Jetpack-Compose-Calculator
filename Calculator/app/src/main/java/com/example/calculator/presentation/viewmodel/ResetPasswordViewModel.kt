@@ -10,6 +10,7 @@ import com.example.calculator.domain.usecase.auth.ValidatePinUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import androidx.lifecycle.viewModelScope
+import com.example.calculator.presentation.ui.navigation.NavigationManager
 import kotlinx.coroutines.launch
 
 @HiltViewModel
@@ -17,10 +18,9 @@ class ResetPasswordViewModel @Inject constructor(
     private val checkBiometricPermission: CheckBiometricsPermissionUseCase,
     private val authWithBiometrics: AuthenticateWithBiometricsUseCase,
     private val validatePin: ValidatePinUseCase,
-    private val resetPassword: ResetPasswordUseCase
+    private val resetPassword: ResetPasswordUseCase,
+    private val navigationManager: NavigationManager
 ) : ViewModel() {
-
-    val navigateTo = mutableStateOf<String?>(null)
 
     private val _isBiometricAllow = mutableStateOf<Boolean>(false)
     val isBiometricAllow: State<Boolean> get() = _isBiometricAllow
@@ -86,7 +86,7 @@ class ResetPasswordViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 resetPassword.invoke(newPassword)
-                navigateTo.value = "calculator"
+                navigationManager.navigate("calculator")
             } catch (e: Exception) {
                 _resetError.value = "Failed to reset password: ${e.message}"
             }
@@ -95,11 +95,7 @@ class ResetPasswordViewModel @Inject constructor(
 
     fun onBack() {
         viewModelScope.launch {
-            navigateTo.value = "login"
+            navigationManager.navigate("login")
         }
-    }
-
-    fun clearError() {
-        _resetError.value = null
     }
 }

@@ -32,6 +32,7 @@ import com.example.calculator.domain.usecase.auth.RegisterUseCase
 import com.example.calculator.domain.usecase.auth.ValidatePasswordUseCase
 import com.example.calculator.domain.usecase.auth.ValidatePinUseCase
 import com.example.calculator.domain.usecase.calculations.ClearCalculationsUseCase
+import com.example.calculator.presentation.ui.navigation.NavigationManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -225,4 +226,10 @@ object AppModule {
     ): CheckBiometricsPermissionUseCase {
         return CheckBiometricsPermissionUseCase(cacheProvider)
     }
+
+    @Provides
+    @Singleton
+    fun provideNavigationManager(): NavigationManager {
+        return NavigationManager
+    }    
 }

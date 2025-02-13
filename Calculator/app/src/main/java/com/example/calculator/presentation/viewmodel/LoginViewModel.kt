@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.calculator.domain.usecase.auth.AuthenticateWithBiometricsUseCase
 import com.example.calculator.domain.usecase.auth.CheckBiometricsPermissionUseCase
 import com.example.calculator.domain.usecase.auth.ValidatePasswordUseCase
+import com.example.calculator.presentation.ui.navigation.NavigationManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.launch
@@ -15,10 +16,9 @@ import kotlinx.coroutines.launch
 class LoginViewModel @Inject constructor(
     private val checkBiometricsPermission: CheckBiometricsPermissionUseCase,
     private val authWithBiometrics: AuthenticateWithBiometricsUseCase,
-    private val validatePassword: ValidatePasswordUseCase
+    private val validatePassword: ValidatePasswordUseCase,
+    private val navigationManager: NavigationManager
 ) : ViewModel() {
-
-    val navigateTo = mutableStateOf<String?>(null)
 
     private val _isBiometricAllow = mutableStateOf<Boolean>(false)
     val isBiometricAllow: State<Boolean> get() = _isBiometricAllow
@@ -37,7 +37,7 @@ class LoginViewModel @Inject constructor(
 
     private fun accessConfirmedSuccessfully() {
         _accessConfirmed.value = true
-        navigateTo.value = "calculator"
+        navigationManager.navigate("calculator")
     }
 
     private fun accessFailure(error: String) {
@@ -64,10 +64,17 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    fun onSignUp(newPassword : String)
+    fun onSignUp()
     {
         viewModelScope.launch {
-            navigateTo.value = "registration"
+            navigationManager.navigate("registration")
+        }
+    }
+
+    fun onResetPassword()
+    {
+        viewModelScope.launch {
+            navigationManager.navigate("reset-password")
         }
     }
 }

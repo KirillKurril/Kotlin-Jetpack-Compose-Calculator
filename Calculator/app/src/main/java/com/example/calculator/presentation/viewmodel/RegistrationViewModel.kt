@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.calculator.domain.usecase.auth.AreBiometricAvailableUseCase
 import com.example.calculator.domain.usecase.auth.RegisterUseCase
 import com.example.calculator.domain.usecase.auth.SetBiometricsPermissionUseCase
+import com.example.calculator.presentation.ui.navigation.NavigationManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -15,10 +16,9 @@ import javax.inject.Inject
 class RegistrationViewModel @Inject constructor(
     private val areBiometricsAvailable: AreBiometricAvailableUseCase,
     private val setBiometricPermission: SetBiometricsPermissionUseCase,
-    private val register: RegisterUseCase
+    private val register: RegisterUseCase,
+    private val navigationManager: NavigationManager
 ) : ViewModel() {
-
-    val navigateTo = mutableStateOf<String?>(null)
 
     private val _isBiometricAvailable = mutableStateOf<Boolean>(false)
     val isBiometricAvailable: State<Boolean> get() = _isBiometricAvailable
@@ -67,16 +67,10 @@ class RegistrationViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 register.invoke(password, pin)
-                navigateTo.value = "login"
+                navigationManager.navigate("login")
             } catch (e: Exception) {
                 _registrationError.value = "Registration failed: ${e.message}"
             }
-        }
-    }
-
-    fun onBack() {
-        viewModelScope.launch {
-            navigateTo.value = "login"
         }
     }
 }

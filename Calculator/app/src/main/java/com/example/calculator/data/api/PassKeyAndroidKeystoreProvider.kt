@@ -117,6 +117,7 @@ class PassKeyAndroidKeystoreProvider(private val context: Context) : PassKeyProv
     }
 
     override fun isUserRegistered(): Boolean {
-        return keyStore.containsAlias(keyAlias)
+        return keyStore.containsAlias(keyAlias) &&
+                sharedPreferences.contains("password_data")
     }
 }

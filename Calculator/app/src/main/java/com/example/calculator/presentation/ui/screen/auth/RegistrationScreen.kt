@@ -18,7 +18,6 @@ import com.example.calculator.presentation.viewmodel.RegistrationViewModel
 @Composable
 fun RegistrationScreen(
     viewModel: RegistrationViewModel = hiltViewModel(),
-    onLoginClick: () -> Unit = {}
 ) {
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
@@ -32,16 +31,6 @@ fun RegistrationScreen(
     val pinMatchError by viewModel.isPinMatch
     val registrationError by viewModel.registrationError
     val isBiometricAvailable by viewModel.isBiometricAvailable
-    val navigateTo by viewModel.navigateTo
-
-    // Navigation handling
-    LaunchedEffect(navigateTo) {
-        navigateTo?.let { destination ->
-            when (destination) {
-                "login" -> onLoginClick()
-            }
-        }
-    }
 
     LaunchedEffect(password, confirmPassword) {
         viewModel.checkPasswordMatch(password, confirmPassword)
@@ -223,15 +212,6 @@ fun RegistrationScreen(
                           pinMatchError
             ) {
                 Text("Register")
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            TextButton(
-                onClick = { viewModel.onBack() },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Back to Login")
             }
         }
     }
