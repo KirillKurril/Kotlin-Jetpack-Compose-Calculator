@@ -108,18 +108,12 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             TextButton(
-                onClick = { viewModel.onSignUp() },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Sign Up")
-            }
-
-            TextButton(
-                onClick = { viewModel.onSignUp() },
+                onClick = { viewModel.onResetPassword() },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Forgot password?")
             }
+
         }
     }
 }

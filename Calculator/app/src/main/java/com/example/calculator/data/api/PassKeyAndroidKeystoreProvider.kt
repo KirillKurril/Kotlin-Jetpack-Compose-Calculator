@@ -106,7 +106,6 @@ class PassKeyAndroidKeystoreProvider(private val context: Context) : PassKeyProv
     }
 
     override fun resetPassword(password : String) {
-        keyStore.deleteEntry(keyAlias)
         encryptAndSavePassword(password)
     }
 
